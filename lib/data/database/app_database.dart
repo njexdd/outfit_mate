@@ -8,12 +8,26 @@ import 'tables.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [ClothingItems])
+@DriftDatabase(tables: [ClothingItems, Outfits])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (Migrator m) async {
+        await m.createAll();
+      },
+      onUpgrade: (Migrator m, int from, int to) async {
+        if (from < 3) {
+          await m.createTable(outfits);
+        }
+      },
+    );
+  }
 
   Future<List<ClothingItem>> getAllItems() => select(clothingItems).get();
 
@@ -34,6 +48,33 @@ class AppDatabase extends _$AppDatabase {
 
   Stream<ClothingItem> watchItem(int id) {
     return (select(clothingItems)..where((t) => t.id.equals(id))).watchSingle();
+  }
+
+  Future<int> insertOutfit(OutfitsCompanion outfit) {
+    return into(outfits).insert(outfit);
+  }
+
+  Stream<List<Outfit>> watchAllOutfits() {
+    return (select(outfits)
+          ..orderBy([(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)]))
+        .watch();
+  }
+
+  Stream<List<Outfit>> watchFavoriteOutfits() {
+    return (select(outfits)
+      ..where((t) => t.isFavorite.equals(true)) // Фильтруем только лайкнутые
+      ..orderBy([(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)]))
+      .watch();
+  }
+
+  Future<int> deleteOutfit(int id) {
+    return (delete(outfits)..where((t) => t.id.equals(id))).go();
+  }
+  
+  Future<void> toggleFavorite(int id, bool isFav) {
+    return (update(outfits)..where((t) => t.id.equals(id))).write(
+      OutfitsCompanion(isFavorite: Value(isFav)),
+    );
   }
 }
 

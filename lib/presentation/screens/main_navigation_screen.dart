@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'home/home_screen.dart';
 import 'wardrobe/wardrobe_screen.dart';
+import 'history/history_screen.dart';
+import 'favorites/favorites_screen.dart';
 import 'settings/settings_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -16,8 +18,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _pages = [
     const HomeScreen(),
     const WardrobeScreen(),
-    const Center(child: Text("История (Скоро)")),
-    const Center(child: Text("Избранное (Скоро)")),
+    const HistoryScreen(),
+    const FavoritesScreen(),
     const SettingsScreen(),
   ];
 

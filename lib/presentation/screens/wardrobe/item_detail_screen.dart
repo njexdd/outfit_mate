@@ -1,42 +1,28 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-
 import '../../../data/database/app_database.dart';
 import '../../../main.dart';
 import 'add_item_screen.dart';
 import '../../../core/utils/snackbar_helper.dart';
+import '../../../core/utils/dialog_helper.dart';
 
 class ItemDetailScreen extends StatelessWidget {
   final int itemId;
 
   const ItemDetailScreen({super.key, required this.itemId});
 
-  Future<void> _deleteItem(BuildContext context, ClothingItem item) async {
-    final confirm = await showDialog<bool>(
+  Future _deleteItem(BuildContext context, ClothingItem item) async {
+    final bool confirm = await DialogHelper.showDeleteConfirmation(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Удалить вещь?'),
-        content: Text(
-          'Вы уверены, что хотите безвозвратно удалить "${item.name}"?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Удалить', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+      title: "Удалить вещь?",
+      description: "Вы уверены, что хотите удалить \"${item.name}\"? Это действие нельзя отменить.",
     );
 
-    if (confirm == true) {
+    if (confirm) {
       await db.deleteItem(item.id);
       final file = File(item.imagePath);
       if (await file.exists()) await file.delete();
-
+      
       if (context.mounted) {
         AppSnackBar.showSuccess(context, 'Вещь удалена');
         Navigator.pop(context);

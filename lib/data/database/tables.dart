@@ -13,3 +13,16 @@ class ClothingItems extends Table {
 
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
+
+class Outfits extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  DateTimeColumn get date => dateTime()();
+  TextColumn get description => text().nullable()(); 
+  BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
+  
+  IntColumn get topId => integer().nullable().references(ClothingItems, #id)();
+  IntColumn get bottomId => integer().nullable().references(ClothingItems, #id)();
+  IntColumn get shoesId => integer().nullable().references(ClothingItems, #id)();
+  IntColumn get outerwearId => integer().nullable().references(ClothingItems, #id)();
+  IntColumn get accessoryId => integer().nullable().references(ClothingItems, #id)();
+}

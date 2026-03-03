@@ -11,6 +11,7 @@ import '../../../core/utils/snackbar_helper.dart';
 import '../../../data/database/app_database.dart';
 import '../../../main.dart';
 import 'dart:convert';
+import 'package:drift/drift.dart' as drift;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -372,6 +373,19 @@ class _HomeScreenState extends State<HomeScreen> {
           };
           _outfitDescription = result['description'];
         });
+
+        final newOutfit = OutfitsCompanion(
+          date: drift.Value(DateTime.now()),
+          description: drift.Value(result['description']),
+          topId: drift.Value(result['top_id']),
+          bottomId: drift.Value(result['bottom_id']),
+          shoesId: drift.Value(result['shoes_id']),
+          outerwearId: drift.Value(result['outerwear_id']),
+          accessoryId: drift.Value(result['accessory_id']),
+          isFavorite: const drift.Value(false),
+        );
+
+        await db.insertOutfit(newOutfit);
 
         await UserPrefs.setLastOutfitJson(jsonEncode(result));
         await UserPrefs.setLastOutfitTimestamp(
