@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/weather_model.dart';
 
 class WeatherService {
-  static const String _apiToken = '';
+  static const String _apiToken = '289549dd-d0e5-4e6e-a2b1-7ee28acb5c4a';
   static const String _baseUrl = 'https://api.gismeteo.net/v4/weather';
 
   static const String _cacheKey = 'cached_weather_json';
