@@ -418,21 +418,52 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                   final items = snapshot.data ?? [];
 
                   if (items.isEmpty) {
+                    // Два разных состояния: фильтры активны vs гардероб реально пустой
+                    final bool hasFilters = _activeFiltersCount > 0;
+                  
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.search_off,
-                            size: 80,
-                            color: Colors.grey.shade300,
+                          Container(
+                            padding: const EdgeInsets.all(32),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                                  blurRadius: 24,
+                                  offset: const Offset(0, 12),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              hasFilters ? Icons.search_off_rounded : Icons.checkroom_outlined,
+                              size: 64,
+                              color: Theme.of(context).primaryColor,
+                            ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 32),
                           Text(
-                            _activeFiltersCount > 0
-                                ? "По этим фильтрам ничего не найдено"
-                                : "Гардероб пуст",
-                            style: TextStyle(color: Colors.grey.shade500),
+                            hasFilters ? "Ничего не найдено" : "Гардероб пуст",
+                            style: TextStyle(
+                              color: Colors.grey.shade800,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            hasFilters
+                                ? "Попробуйте изменить\nпараметры фильтров"
+                                : "Добавьте первую вещь,\nнажав кнопку ниже",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 15,
+                              height: 1.5,
+                            ),
                           ),
                         ],
                       ),

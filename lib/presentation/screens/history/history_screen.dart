@@ -60,10 +60,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  Future<void> _toggleFavorite(Outfit outfit) async {
-    final newValue = !outfit.isFavorite;
-    await db.toggleFavorite(outfit.id, newValue);
+  Future _toggleFavorite(Outfit outfit) async {
+  final newValue = !outfit.isFavorite;
+  await db.toggleFavorite(outfit.id, newValue);
+
+  if (mounted) {
+    AppSnackBar.showSuccess(
+      context, 
+      newValue ? 'Образ добавлен в избранное' : 'Образ убран из избранного'
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {

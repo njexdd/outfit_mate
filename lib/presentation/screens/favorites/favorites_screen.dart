@@ -42,27 +42,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   // Удаляем лайк (образ исчезнет из списка автоматически)
-  Future<void> _toggleFavorite(Outfit outfit) async {
-    // Если убираем лайк в Избранном, спрашиваем подтверждение? 
-    // Обычно нет, просто убираем. Но можно добавить Undo в SnackBar.
-    await db.toggleFavorite(outfit.id, false);
-    
-    if (mounted) {
-      // Показываем снекбар с кнопкой отмены (очень крутая фича!)
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Удалено из избранного'),
-          action: SnackBarAction(
-            label: 'ВЕРНУТЬ',
-            onPressed: () async {
-              await db.toggleFavorite(outfit.id, true);
-            },
-          ),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
+  Future _toggleFavorite(Outfit outfit) async {
+  await db.toggleFavorite(outfit.id, false);
+  
+  if (mounted) {
+    AppSnackBar.showSuccess(context, 'Образ убран из избранного');
   }
+}
 
   Future<void> _deleteOutfit(int id) async {
     final bool confirm = await DialogHelper.showDeleteConfirmation(
