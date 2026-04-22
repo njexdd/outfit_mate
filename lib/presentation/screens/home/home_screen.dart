@@ -66,7 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showCityDialog() {
-    final controller = TextEditingController(text: _currentCity);
     String searchQuery = '';
 
     showDialog(
@@ -96,22 +95,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Введите название города для точного прогноза погоды.",
+                    "Выберите город из списка.",
                     style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                   ),
                   const SizedBox(height: 24),
 
+                  // Поле поиска (только фильтрация, не свободный ввод)
                   TextField(
-                    controller: controller,
                     onChanged: (value) {
                       setModalState(() {
                         searchQuery = value;
                       });
                     },
                     decoration: InputDecoration(
-                      hintText: "Например: Брест",
+                      hintText: "Поиск города...",
                       prefixIcon: Icon(
-                        Icons.location_city,
+                        Icons.search,
                         color: Theme.of(context).primaryColor,
                       ),
                       filled: true,
@@ -136,144 +135,131 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
 
+                  // Быстрые чипы (только когда поиск пуст)
                   if (searchQuery.isEmpty) ...[
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       physics: const BouncingScrollPhysics(),
                       child: Row(
-                        children:
-                            [
-                              'Минск',
-                              'Гомель',
-                              'Брест',
-                              'Витебск',
-                              'Гродно',
-                              'Могилёв',
-                            ].map((city) {
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: ActionChip(
-                                  label: Text(
-                                    city,
-                                    style: TextStyle(
-                                      color: Colors.grey.shade800,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  backgroundColor: Colors.grey.shade100,
-                                  side: BorderSide.none,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  onPressed: () {
-                                    controller.text = city;
-                                    setModalState(() => searchQuery = city);
-                                  },
+                        children: [
+                          'Минск',
+                          'Гомель',
+                          'Брест',
+                          'Витебск',
+                          'Гродно',
+                          'Могилев',
+                        ].map((city) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: ActionChip(
+                              label: Text(
+                                city,
+                                style: TextStyle(
+                                  color: Colors.grey.shade800,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                              );
-                            }).toList(),
-                      ),
-                    ),
-                  ] else ...[
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 168),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey.shade200),
-                        ),
-                        child: MediaQuery.removePadding(
-                          context: context,
-                          removeTop: true,
-                          removeBottom: true,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: const BouncingScrollPhysics(),
-                            itemCount: filteredCities.length,
-                            itemBuilder: (context, index) {
-                              final city = filteredCities[index];
-                              return ListTile(
-                                title: Text(
-                                  city,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                trailing: const Icon(
-                                  Icons.arrow_outward,
-                                  size: 16,
-                                  color: Colors.grey,
-                                ),
-                                onTap: () {
-                                  controller.text = city;
-                                  setModalState(() => searchQuery = '');
-                                  FocusScope.of(context).unfocus();
-                                },
-                              );
-                            },
-                          ),
-                        ),
+                              ),
+                              backgroundColor: Colors.grey.shade100,
+                              side: BorderSide.none,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              onPressed: () {
+                                // Сразу применяем выбор без кнопки «Сохранить»
+                                setState(() => _currentCity = city);
+                                UserPrefs.setCity(city);
+                                Navigator.pop(ctx);
+                                _loadWeather();
+                              },
+                            ),
+                          );
+                        }).toList(),
                       ),
                     ),
                   ],
 
-                  const SizedBox(height: 32),
+                  // Список городов (всегда показывается при поиске, и по умолчанию)
+                  const SizedBox(height: 8),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 200),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: MediaQuery.removePadding(
+                        context: context,
+                        removeTop: true,
+                        removeBottom: true,
+                        child: filteredCities.isEmpty
+                            ? Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  'Город не найден',
+                                  style: TextStyle(color: Colors.grey.shade500),
+                                ),
+                              )
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                physics: const BouncingScrollPhysics(),
+                                itemCount: filteredCities.length,
+                                itemBuilder: (context, index) {
+                                  final city = filteredCities[index];
+                                  final isSelected = city == _currentCity;
+                                  return ListTile(
+                                    title: Text(
+                                      city,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        color: isSelected
+                                            ? Theme.of(context).primaryColor
+                                            : null,
+                                      ),
+                                    ),
+                                    trailing: isSelected
+                                        ? Icon(
+                                            Icons.check,
+                                            color: Theme.of(context).primaryColor,
+                                            size: 18,
+                                          )
+                                        : const Icon(
+                                            Icons.arrow_outward,
+                                            size: 16,
+                                            color: Colors.grey,
+                                          ),
+                                    onTap: () {
+                                      setState(() => _currentCity = city);
+                                      UserPrefs.setCity(city);
+                                      Navigator.pop(ctx);
+                                      _loadWeather();
+                                    },
+                                  );
+                                },
+                              ),
+                      ),
+                    ),
+                  ),
 
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () => Navigator.pop(ctx),
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                          ),
-                          child: const Text(
-                            "Отмена",
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
+                  const SizedBox(height: 16),
+
+                  // Только кнопка «Отмена» — выбор происходит по тапу на город
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        flex: 2,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (controller.text.trim().isNotEmpty) {
-                              setState(
-                                () => _currentCity = controller.text.trim(),
-                              );
-                              UserPrefs.setCity(_currentCity);
-                              Navigator.pop(ctx);
-                              _loadWeather();
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).primaryColor,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: const Text(
-                            "Сохранить",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
+                    ),
+                    child: const Text(
+                      "Отмена",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
