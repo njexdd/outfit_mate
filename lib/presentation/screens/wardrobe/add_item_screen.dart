@@ -9,6 +9,7 @@ import '../../../data/database/app_database.dart';
 import '../../../main.dart';
 import '../../widgets/custom_dropdown.dart';
 import '../../../core/utils/snackbar_helper.dart';
+import '../../../core/constants.dart';
 
 class AddItemScreen extends StatefulWidget {
   final ClothingItem? itemToEdit;
@@ -33,28 +34,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
   String _selectedStyle = 'Casual';
   Color _currentColor = Colors.black;
 
-  final List<String> _categories = [
-    'Верх',
-    'Низ',
-    'Обувь',
-    'Верхняя одежда',
-    'Аксессуары',
-  ];
-  final List<String> _styles = [
-    'Casual',
-    'Спорт',
-    'Деловой',
-    'Гранж',
-    'Домашний',
-  ];
+  final List<String> _categories = AppConstants.categories;
+  final List<String> _styles = AppConstants.styles;
 
-  final Map<String, List<String>> _subCategoriesMap = {
-    'Верх': ['Футболка', 'Рубашка', 'Свитер', 'Худи', 'Пиджак', 'Топ'],
-    'Низ': ['Джинсы', 'Брюки', 'Шорты', 'Юбка', 'Спортивки'],
-    'Обувь': ['Кроссовки', 'Туфли', 'Ботинки', 'Сапоги', 'Сандалии'],
-    'Верхняя одежда': ['Куртка', 'Пальто', 'Тренч', 'Пуховик', 'Ветровка'],
-    'Аксессуары': ['Шапка', 'Шарф', 'Кепка', 'Ремень', 'Сумка', 'Перчатки'],
-  };
+  final Map<String, List<String>> _subCategoriesMap = AppConstants.subCategoriesMap;
 
   @override
   void initState() {

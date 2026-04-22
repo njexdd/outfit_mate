@@ -366,7 +366,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Wrap(
               spacing: 10,
               runSpacing: 10,
-              children: ["Casual", "Спорт", "Деловой", "Гранж"].map((style) {
+              children: AppConstants.styles.map((style) {
                 final isSelected = _selectedStyle == style;
                 return ChoiceChip(
                   label: Text(style),
@@ -399,7 +399,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Wrap(
               spacing: 10,
               runSpacing: 10,
-              children: ["Базовые", "Яркие", "Темные", "Пастельные"].map((
+              children: AppConstants.colorPalettes.map((
                 color,
               ) {
                 final isSelected = _selectedColors == color;

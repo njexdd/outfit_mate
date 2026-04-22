@@ -6,6 +6,7 @@ import '../../../data/database/app_database.dart';
 import '../../../main.dart';
 import 'add_item_screen.dart';
 import 'item_detail_screen.dart';
+import '../../../core/constants.dart';
 
 class WardrobeScreen extends StatefulWidget {
   const WardrobeScreen({super.key});
@@ -19,21 +20,8 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
   String? _filterStyle;
   int? _filterWarmth;
 
-  final List<String> _categories = [
-    'Все',
-    'Верх',
-    'Низ',
-    'Обувь',
-    'Верхняя одежда',
-    'Аксессуары',
-  ];
-  final List<String> _styles = [
-    'Casual',
-    'Спорт',
-    'Деловой',
-    'Гранж',
-    'Домашний',
-  ];
+  final List<String> _categories = ['Все', ...AppConstants.categories];
+  final List<String> _styles = AppConstants.styles;
 
   Stream<List<ClothingItem>> _getItemsStream() {
     return (db.select(db.clothingItems)

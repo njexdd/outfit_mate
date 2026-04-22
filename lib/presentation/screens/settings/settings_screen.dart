@@ -186,13 +186,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   CustomDropdown(
                     label: "Предпочитаемый стиль",
                     value: _style,
-                    items: const [
-                      'Casual',
-                      'Спорт',
-                      'Деловой',
-                      'Гранж',
-                      'Домашний',
-                    ],
+                    items: AppConstants.styles,
                     onChanged: (val) {
                       setState(() => _style = val!);
                       _updateSettings();
@@ -202,7 +196,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   CustomDropdown(
                     label: "Любимая палитра",
                     value: _colorPalette,
-                    items: const ['Базовые', 'Яркие', 'Темные', 'Пастельные'],
+                    items: AppConstants.colorPalettes,
                     onChanged: (val) {
                       setState(() => _colorPalette = val!);
                       _updateSettings();
