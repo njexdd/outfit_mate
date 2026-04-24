@@ -522,22 +522,27 @@ class _HomeScreenState extends State<HomeScreen> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
           decoration: BoxDecoration(
-            color: value ? Theme.of(context).primaryColor : Colors.white,
+            gradient: value
+                ? const LinearGradient(
+                    colors: [Color(0xFF4A90E2), Color(0xFF002984)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+            color: value ? null : Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: value
-                  ? Theme.of(context).primaryColor
-                  : Colors.grey.shade300,
-              width: 1.5,
-            ),
+            border: value
+                ? null
+                : Border.all(
+                    color: Colors.grey.shade300,
+                    width: 1.5,
+                  ),
             boxShadow: value
                 ? [
                     BoxShadow(
-                      color: Theme.of(
-                        context,
-                      ).primaryColor.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
+                      color: const Color(0xFF4A90E2).withValues(alpha: 0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
                     ),
                   ]
                 : [],

@@ -134,19 +134,11 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                       spacing: 8,
                       runSpacing: 8,
                       children: _categories.map((cat) {
-                        final isSelected = tempCategory == cat;
-                        return ChoiceChip(
-                          label: Text(cat),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            if (selected)
-                              setModalState(() => tempCategory = cat);
-                          },
-                          selectedColor: Theme.of(context).primaryColor,
-                          labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black87,
-                          ),
-                          showCheckmark: false,
+                        return _buildFilterChip(
+                          cat,
+                          cat,
+                          tempCategory,
+                          (v) { if (v) setModalState(() => tempCategory = cat); },
                         );
                       }).toList(),
                     ),
@@ -208,9 +200,24 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                     ),
                     const SizedBox(height: 32),
 
-                    SizedBox(
+                    Container(
                       width: double.infinity,
                       height: 55,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF4A90E2), Color(0xFF002984)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF4A90E2).withValues(alpha: 0.4),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
                       child: ElevatedButton(
                         onPressed: () {
                           setState(() {
@@ -221,8 +228,8 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).primaryColor,
-                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -232,6 +239,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -247,25 +255,51 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
   }
 
   Widget _buildFilterChip(
-    String label,
-    dynamic value,
-    dynamic groupValue,
-    Function(bool) onSelected,
-  ) {
-    final isSelected = groupValue == value;
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: onSelected,
-      selectedColor: Theme.of(context).primaryColor.withValues(alpha: 0.15),
-      checkmarkColor: Theme.of(context).primaryColor,
-      side: BorderSide(
-        color: isSelected
-            ? Theme.of(context).primaryColor
-            : Colors.grey.shade300,
+  String label,
+  dynamic value,
+  dynamic groupValue,
+  Function(bool) onSelected,
+) {
+  final isSelected = groupValue == value;
+  return GestureDetector(
+    onTap: () => onSelected(!isSelected),
+    child: AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      decoration: BoxDecoration(
+        color: isSelected ? null : Colors.white,
+        gradient: isSelected
+            ? const LinearGradient(
+                colors: [Color(0xFF4A90E2), Color(0xFF002984)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : null,
+        borderRadius: BorderRadius.circular(12),
+        border: isSelected
+            ? null
+            : Border.all(color: Colors.grey.shade300, width: 1.5),
+        boxShadow: isSelected
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF4A90E2).withValues(alpha: 0.4),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ]
+            : [],
       ),
-    );
-  }
+      child: Text(
+        label,
+        style: TextStyle(
+          color: isSelected ? Colors.white : Colors.black87,
+          fontSize: 13,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+        ),
+      ),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
