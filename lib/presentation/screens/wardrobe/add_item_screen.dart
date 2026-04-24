@@ -214,254 +214,290 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isEditing = widget.itemToEdit != null;
-
-    ImageProvider? imageProvider;
-    if (_imageFile != null) {
-      imageProvider = FileImage(_imageFile!);
-    } else if (_existingImagePath != null) {
-      imageProvider = FileImage(File(_existingImagePath!));
-    }
+    final isEditing = widget.itemToEdit != null; // [cite: 528]
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F7FA), // Фирменный фон 
       appBar: AppBar(
-        title: Text(isEditing ? "Редактировать вещь" : "Добавить вещь"),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(
-          left: 16.0,
-          right: 16.0,
-          top: 16.0,
-          bottom: 40.0,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          isEditing ? 'Редактировать вещь' : 'Новая вещь',
+          style: const TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+            letterSpacing: -0.5,
+          ),
         ),
-        child: Form(
-          key: _formKey,
+        iconTheme: const IconThemeData(color: Colors.black87),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: GestureDetector(
-                  onTap: () => _pickImage(ImageSource.gallery),
-                  child: Container(
-                    width: 160,
-                    height: 160,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(20),
-                      image: imageProvider != null
-                          ? DecorationImage(
-                              image: imageProvider,
-                              fit: BoxFit.cover,
-                            )
-                          : null,
-                    ),
-                    child: imageProvider == null
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.add_a_photo,
-                                size: 40,
-                                color: Colors.grey,
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                "Добавить фото",
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          )
-                        : null,
-                  ),
-                ),
-              ),
-              SizedBox(height: 24),
-
-              // Пример того, куда это можно вставить (под контейнером с фото)
-              if (_imageFile != null) ...[
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _isScanning ? null : _scanItem,
-                    icon: _isScanning 
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : const Icon(Icons.auto_awesome), // Иконка магии/ИИ
-                    label: Text(_isScanning ? 'Распознавание...' : 'Распознать по фото'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-              ],
-
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: "Название вещи",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Введите название' : null,
-              ),
-              SizedBox(height: 20),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomDropdown(
-                      label: "Категория",
-                      value: _selectedCategory,
-                      items: _categories,
-                      onChanged: (val) {
-                        setState(() {
-                          _selectedCategory = val!;
-                          _selectedSubCategory =
-                              _subCategoriesMap[_selectedCategory]!.first;
-                        });
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: CustomDropdown(
-                      label: "Тип",
-                      value:
-                          _selectedSubCategory ??
-                          _subCategoriesMap[_selectedCategory]!.first,
-                      items: _subCategoriesMap[_selectedCategory]!,
-                      onChanged: (val) =>
-                          setState(() => _selectedSubCategory = val),
-                    ),
-                  ),
-                ],
-              ),
+              _buildImageSection(),
               const SizedBox(height: 24),
+              _buildFormCard(),
+              const SizedBox(height: 32),
+              _buildSaveButton(isEditing),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-              const Text(
-                "Основной цвет",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(height: 10),
-              GestureDetector(
-                onTap: _showColorPicker,
-                child: Container(
-                  height: 60,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade400),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: _currentColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.grey.shade300,
-                            width: 2,
+  // Секция с фотографией и кнопкой ИИ-сканера
+  // Секция с фотографией и кнопкой ИИ-сканера
+  Widget _buildImageSection() {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () => _pickImage(ImageSource.gallery), //
+          child: Container(
+            height: 240,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24), // В стиле OutfitCard
+              border: _imageFile == null && _existingImagePath == null
+                  ? Border.all(color: Colors.grey.shade300, style: BorderStyle.solid) //
+                  : null,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04), //
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: _imageFile != null
+                ? Image.file(_imageFile!, fit: BoxFit.cover)
+                : (_existingImagePath != null
+                    ? Image.file(File(_existingImagePath!), fit: BoxFit.cover)
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_a_photo_outlined, size: 48, color: Colors.grey.shade400),
+                          const SizedBox(height: 12),
+                          Text(
+                            "Нажмите, чтобы добавить фото",
+                            style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: _currentColor.withValues(alpha: 0.3),
-                              blurRadius: 4,
-                              spreadRadius: 1,
-                            ),
-                          ],
+                        ],
+                      )),
+          ),
+        ),
+        const SizedBox(height: 16),
+        
+        // ИСПРАВЛЕНО: Кнопка AI-сканирования теперь с видимым фоном-градиентом
+        Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF4A90E2), Color(0xFF002984)], // Наш фирменный градиент
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF4A90E2).withValues(alpha: 0.3), // Легкое свечение
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: ElevatedButton.icon(
+            onPressed: _isScanning ? null : _scanItem,
+            icon: _isScanning 
+                ? const SizedBox(
+                    width: 20, 
+                    height: 20, 
+                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                  )
+                : const Icon(Icons.auto_awesome, color: Colors.white),
+            label: Text(
+              _isScanning ? "ИИ анализирует..." : "Распознать с помощью ИИ",
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+              backgroundColor: Colors.transparent, // Фон прозрачный, чтобы было видно градиент контейнера
+              shadowColor: Colors.transparent, // Убираем стандартную тень кнопки, т.к. есть тень у контейнера
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ).copyWith(
+              elevation: WidgetStateProperty.all(0),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Карточка с формой ввода
+  Widget _buildFormCard() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24), // 
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03), // 
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Form(
+        key: _formKey, // [cite: 519]
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Название", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 8),
+            TextFormField(
+              controller: _nameController, // [cite: 519]
+              decoration: InputDecoration(
+                hintText: 'Например: Любимое худи',
+                filled: true,
+                fillColor: Colors.grey.shade50,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade200),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Colors.grey.shade200),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(color: Theme.of(context).primaryColor),
+                ),
+              ),
+              validator: (value) => value == null || value.isEmpty ? 'Введите название' : null,
+            ),
+            const SizedBox(height: 20),
+            
+            CustomDropdown( // [cite: 550]
+              label: 'Категория',
+              value: _selectedCategory,
+              items: _categories.cast<String>(), // [cite: 522]
+              onChanged: (val) {
+                if (val != null) setState(() {
+                  _selectedCategory = val;
+                  _selectedSubCategory = _subCategoriesMap[val]?.first; // [cite: 522]
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+
+            if (_selectedSubCategory != null) ...[
+              CustomDropdown( // [cite: 550]
+                label: 'Подкатегория',
+                value: _selectedSubCategory!,
+                items: _subCategoriesMap[_selectedCategory] ?? [],
+                onChanged: (val) {
+                  if (val != null) setState(() => _selectedSubCategory = val);
+                },
+              ),
+              const SizedBox(height: 20),
+            ],
+
+            CustomDropdown( // [cite: 550]
+              label: 'Стиль',
+              value: _selectedStyle,
+              items: _styles.cast<String>(), // [cite: 522]
+              onChanged: (val) {
+                if (val != null) setState(() => _selectedStyle = val);
+              },
+            ),
+            const SizedBox(height: 20),
+
+            // Выбор цвета и теплоты в одном ряду для компактности
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Цвет", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap: _showColorPicker, // [cite: 525]
+                        child: Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: _currentColor, // [cite: 521]
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.grey.shade300, width: 2),
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      const Text(
-                        "Выбрать цвет",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const Spacer(),
-                      const Icon(Icons.colorize, color: Colors.grey),
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
-
-              const Text(
-                "На какую погоду?",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              Slider(
-                value: _warmthLevel,
-                min: 1,
-                max: 3,
-                divisions: 2,
-                label: _warmthLevel == 1
-                    ? "Лето"
-                    : (_warmthLevel == 2 ? "Демисезон" : "Зима"),
-                onChanged: (val) => setState(() => _warmthLevel = val),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [Text("Лето"), Text("Деми"), Text("Зима")],
-              ),
-              const SizedBox(height: 24),
-
-              const Text(
-                "Стиль",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: _styles.map((style) {
-                  final isSelected = _selectedStyle == style;
-                  return ChoiceChip(
-                    label: Text(style),
-                    selected: isSelected,
-                    onSelected: (s) {
-                      if (s) setState(() => _selectedStyle = style);
+                const SizedBox(width: 16),
+                Expanded(
+                  child: CustomDropdown( // [cite: 550]
+                    label: 'Сезон',
+                    value: _warmthLevel == 1 ? 'Лето' : (_warmthLevel == 2 ? 'Деми' : 'Зима'), // [cite: 541, 542]
+                    items: const ['Лето', 'Деми', 'Зима'],
+                    onChanged: (val) {
+                      setState(() {
+                        if (val == 'Лето') _warmthLevel = 1.0;
+                        if (val == 'Деми') _warmthLevel = 2.0;
+                        if (val == 'Зима') _warmthLevel = 3.0;
+                      });
                     },
-                    selectedColor: Theme.of(context).primaryColor,
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : Colors.black,
-                    ),
-                    showCheckmark: false,
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 40),
-
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: _saveItem,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                  child: Text(
-                    isEditing ? "Сохранить изменения" : "Добавить в гардероб",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Кнопка сохранения в стиле FloatingActionButton из WardrobeScreen
+  Widget _buildSaveButton(bool isEditing) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient( // Фирменный градиент 
+          colors: [Color(0xFF4A90E2), Color(0xFF002984)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF4A90E2).withValues(alpha: 0.4), // 
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: _saveItem, // [cite: 527]
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 18),
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        ),
+        child: Text(
+          isEditing ? "Сохранить изменения" : "Добавить в гардероб",
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
