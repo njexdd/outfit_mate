@@ -10,6 +10,7 @@ import '../../../main.dart';
 import '../../widgets/custom_dropdown.dart';
 import '../../../core/utils/snackbar_helper.dart';
 import '../../../core/constants.dart';
+import '../../../core/services/ai_scanner_service.dart';
 
 class AddItemScreen extends StatefulWidget {
   final ClothingItem? itemToEdit;
@@ -68,6 +69,45 @@ class _AddItemScreenState extends State<AddItemScreen> {
   Future<void> _pickImage(ImageSource source) async {
     final XFile? pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) setState(() => _imageFile = File(pickedFile.path));
+  }
+
+  bool _isScanning = false;
+
+  Future<void> _scanItem() async {
+    if (_imageFile == null) {
+      AppSnackBar.showError(context, 'Сначала выберите фото');
+      return;
+    }
+
+    setState(() => _isScanning = true);
+
+    // Вызываем наш сервис
+    final result = await AiScannerService.analyzeImage(_imageFile!);
+
+    setState(() => _isScanning = false);
+
+    if (result != null) {
+      setState(() {
+        // Обновляем состояния, если ИИ вернул не null
+        if (result['category'] != null) _selectedCategory = result['category'];
+        
+        // Сбрасываем подкатегорию, чтобы не было конфликтов, затем ставим новую
+        _selectedSubCategory = null; 
+        if (result['subCategory'] != null) _selectedSubCategory = result['subCategory'];
+        
+        if (result['style'] != null) _selectedStyle = result['style'];
+        if (result['warmthLevel'] != null) _warmthLevel = result['warmthLevel'].toDouble();
+        
+        // Парсим цвет
+        if (result['colorHex'] != null) {
+          _currentColor = Color(int.parse(result['colorHex'], radix: 16));
+        }
+      });
+      
+      AppSnackBar.showSuccess(context, 'Вещь распознана!');
+    } else {
+      AppSnackBar.showError(context, 'Не удалось распознать вещь');
+    }
   }
 
   void _showColorPicker() {
@@ -236,6 +276,28 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 ),
               ),
               SizedBox(height: 24),
+
+              // Пример того, куда это можно вставить (под контейнером с фото)
+              if (_imageFile != null) ...[
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _isScanning ? null : _scanItem,
+                    icon: _isScanning 
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : const Icon(Icons.auto_awesome), // Иконка магии/ИИ
+                    label: Text(_isScanning ? 'Распознавание...' : 'Распознать по фото'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
 
               TextFormField(
                 controller: _nameController,
