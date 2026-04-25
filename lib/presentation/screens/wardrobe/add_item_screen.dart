@@ -88,6 +88,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
     if (result != null) {
       setState(() {
+        if (result['name'] != null) _nameController.text = result['name']; 
+
         // Обновляем состояния, если ИИ вернул не null
         if (result['category'] != null) _selectedCategory = result['category'];
         
