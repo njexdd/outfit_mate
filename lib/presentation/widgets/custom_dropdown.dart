@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomDropdown extends StatelessWidget {
   final String value;
-  final List<String> items;
+  final List items; // Можно типизировать как List<String>, если там всегда строки
   final Function(String?) onChanged;
   final String label;
 
@@ -22,20 +22,26 @@ class CustomDropdown extends StatelessWidget {
         if (label.isNotEmpty) ...[
           Text(
             label,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: const TextStyle(
+              fontWeight: FontWeight.w600, // Чуть мягче, чем bold
+              fontSize: 15,
+              color: Colors.black87,
+            ),
           ),
           const SizedBox(height: 8),
         ],
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          // Немного уменьшен vertical padding для более аккуратного вида
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2), 
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade300, width: 1),
+            // Сделали границу чуть мягче и толще (1.5) для премиального вида
+            border: Border.all(color: Colors.grey.shade200, width: 1.5), 
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 10,
+                color: Colors.black.withValues(alpha: 0.04), // Более мягкая тень
+                blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
             ],
@@ -44,20 +50,28 @@ class CustomDropdown extends StatelessWidget {
             child: DropdownButton<String>(
               value: value,
               isExpanded: true,
-              icon: const Icon(
+              // КРИТИЧНОЕ ИСПРАВЛЕНИЕ: Ограничиваем высоту меню, чтобы оно не на весь экран
+              menuMaxHeight: 300, 
+              icon: Icon(
                 Icons.keyboard_arrow_down_rounded,
-                color: Colors.grey,
+                color: Colors.grey.shade400, // Более мягкий цвет иконки
               ),
               dropdownColor: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              elevation: 4,
+              elevation: 8, // Чуть больше тени у самого выпадающего списка
               style: const TextStyle(
                 color: Colors.black87,
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
               items: items.map((e) {
-                return DropdownMenuItem(value: e, child: Text(e));
+                return DropdownMenuItem<String>(
+                  value: e.toString(),
+                  child: Text(
+                    e.toString(),
+                    overflow: TextOverflow.ellipsis, // Защита от слишком длинного текста
+                  ),
+                );
               }).toList(),
               onChanged: onChanged,
             ),
