@@ -107,7 +107,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
     } on Exception catch (e) {
       AppSnackBar.showError(
         context,
-        'Ошибка: ${e.toString().replaceFirst('Exception: ', '')}',
+        '${e.toString().replaceFirst('Exception: ', '')}',
       );
     } finally {
       setState(() => _isScanning = false);

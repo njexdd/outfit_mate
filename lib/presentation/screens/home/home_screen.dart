@@ -389,7 +389,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) {
         AppSnackBar.showError(
           context,
-          'Ошибка: ${e.toString().replaceFirst('Exception: ', '')}',
+          '${e.toString().replaceFirst('Exception: ', '')}',
         );
       }
     } finally {
