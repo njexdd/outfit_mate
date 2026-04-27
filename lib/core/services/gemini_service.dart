@@ -101,6 +101,7 @@ ${jsonEncode(wardrobeJson)}
       }
     } catch (e) {
       print('Ошибка Gemini API: $e');
+      // Пробрасываем дальше, чтобы вызывающий код мог перехватить
       rethrow;
     }
   }
