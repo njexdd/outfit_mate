@@ -141,39 +141,40 @@ class _HomeScreenState extends State<HomeScreen> {
                       scrollDirection: Axis.horizontal,
                       physics: const BouncingScrollPhysics(),
                       child: Row(
-                        children: [
-                          'Минск',
-                          'Гомель',
-                          'Брест',
-                          'Витебск',
-                          'Гродно',
-                          'Могилев',
-                        ].map((city) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: ActionChip(
-                              label: Text(
-                                city,
-                                style: TextStyle(
-                                  color: Colors.grey.shade800,
-                                  fontWeight: FontWeight.w500,
+                        children:
+                            [
+                              'Минск',
+                              'Гомель',
+                              'Брест',
+                              'Витебск',
+                              'Гродно',
+                              'Могилев',
+                            ].map((city) {
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: ActionChip(
+                                  label: Text(
+                                    city,
+                                    style: TextStyle(
+                                      color: Colors.grey.shade800,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  backgroundColor: Colors.grey.shade100,
+                                  side: BorderSide.none,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  onPressed: () {
+                                    // Сразу применяем выбор без кнопки «Сохранить»
+                                    setState(() => _currentCity = city);
+                                    UserPrefs.setCity(city);
+                                    Navigator.pop(ctx);
+                                    _loadWeather();
+                                  },
                                 ),
-                              ),
-                              backgroundColor: Colors.grey.shade100,
-                              side: BorderSide.none,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              onPressed: () {
-                                // Сразу применяем выбор без кнопки «Сохранить»
-                                setState(() => _currentCity = city);
-                                UserPrefs.setCity(city);
-                                Navigator.pop(ctx);
-                                _loadWeather();
-                              },
-                            ),
-                          );
-                        }).toList(),
+                              );
+                            }).toList(),
                       ),
                     ),
                   ],
@@ -220,7 +221,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     trailing: isSelected
                                         ? Icon(
                                             Icons.check,
-                                            color: Theme.of(context).primaryColor,
+                                            color: Theme.of(
+                                              context,
+                                            ).primaryColor,
                                             size: 18,
                                           )
                                         : const Icon(
@@ -382,8 +385,13 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         AppSnackBar.showError(context, 'Не удалось сгенерировать образ');
       }
-    } catch (e) {
-      AppSnackBar.showError(context, 'Ошибка: $e');
+    } on Exception catch (e) {
+      if (mounted) {
+        AppSnackBar.showError(
+          context,
+          'Ошибка: ${e.toString().replaceFirst('Exception: ', '')}',
+        );
+      }
     } finally {
       setState(() => _isGenerating = false);
     }
@@ -533,10 +541,7 @@ class _HomeScreenState extends State<HomeScreen> {
             borderRadius: BorderRadius.circular(16),
             border: value
                 ? null
-                : Border.all(
-                    color: Colors.grey.shade300,
-                    width: 1.5,
-                  ),
+                : Border.all(color: Colors.grey.shade300, width: 1.5),
             boxShadow: value
                 ? [
                     BoxShadow(

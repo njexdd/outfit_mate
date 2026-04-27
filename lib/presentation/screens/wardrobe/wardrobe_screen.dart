@@ -134,12 +134,9 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                       spacing: 8,
                       runSpacing: 8,
                       children: _categories.map((cat) {
-                        return _buildFilterChip(
-                          cat,
-                          cat,
-                          tempCategory,
-                          (v) { if (v) setModalState(() => tempCategory = cat); },
-                        );
+                        return _buildFilterChip(cat, cat, tempCategory, (v) {
+                          if (v) setModalState(() => tempCategory = cat);
+                        });
                       }).toList(),
                     ),
                     const SizedBox(height: 24),
@@ -212,7 +209,9 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF4A90E2).withValues(alpha: 0.4),
+                            color: const Color(
+                              0xFF4A90E2,
+                            ).withValues(alpha: 0.4),
                             blurRadius: 12,
                             offset: const Offset(0, 6),
                           ),
@@ -255,51 +254,51 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
   }
 
   Widget _buildFilterChip(
-  String label,
-  dynamic value,
-  dynamic groupValue,
-  Function(bool) onSelected,
-) {
-  final isSelected = groupValue == value;
-  return GestureDetector(
-    onTap: () => onSelected(!isSelected),
-    child: AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      decoration: BoxDecoration(
-        color: isSelected ? null : Colors.white,
-        gradient: isSelected
-            ? const LinearGradient(
-                colors: [Color(0xFF4A90E2), Color(0xFF002984)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null,
-        borderRadius: BorderRadius.circular(12),
-        border: isSelected
-            ? null
-            : Border.all(color: Colors.grey.shade300, width: 1.5),
-        boxShadow: isSelected
-            ? [
-                BoxShadow(
-                  color: const Color(0xFF4A90E2).withValues(alpha: 0.4),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ]
-            : [],
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: isSelected ? Colors.white : Colors.black87,
-          fontSize: 13,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+    String label,
+    dynamic value,
+    dynamic groupValue,
+    Function(bool) onSelected,
+  ) {
+    final isSelected = groupValue == value;
+    return GestureDetector(
+      onTap: () => onSelected(!isSelected),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? null : Colors.white,
+          gradient: isSelected
+              ? const LinearGradient(
+                  colors: [Color(0xFF4A90E2), Color(0xFF002984)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          borderRadius: BorderRadius.circular(12),
+          border: isSelected
+              ? null
+              : Border.all(color: Colors.grey.shade300, width: 1.5),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF4A90E2).withValues(alpha: 0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ]
+              : [],
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.black87,
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -442,7 +441,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                   if (items.isEmpty) {
                     // Два разных состояния: фильтры активны vs гардероб реально пустой
                     final bool hasFilters = _activeFiltersCount > 0;
-                  
+
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -454,14 +453,18 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                                  color: Theme.of(
+                                    context,
+                                  ).primaryColor.withValues(alpha: 0.1),
                                   blurRadius: 24,
                                   offset: const Offset(0, 12),
                                 ),
                               ],
                             ),
                             child: Icon(
-                              hasFilters ? Icons.search_off_rounded : Icons.checkroom_outlined,
+                              hasFilters
+                                  ? Icons.search_off_rounded
+                                  : Icons.checkroom_outlined,
                               size: 64,
                               color: Theme.of(context).primaryColor,
                             ),
@@ -528,10 +531,14 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(24), // Увеличено скругление для современного вида
+          borderRadius: BorderRadius.circular(
+            24,
+          ), // Увеличено скругление для современного вида
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06), // Более глубокая и мягкая тень
+              color: Colors.black.withValues(
+                alpha: 0.06,
+              ), // Более глубокая и мягкая тень
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -554,12 +561,19 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Container(
                         color: Colors.grey.shade100,
-                        child: Icon(Icons.broken_image_rounded, color: Colors.grey.shade400, size: 32),
+                        child: Icon(
+                          Icons.broken_image_rounded,
+                          color: Colors.grey.shade400,
+                          size: 32,
+                        ),
                       ),
                     ),
                     // Легкий градиент для мягкого перехода к текстовой части
                     Positioned(
-                      bottom: 0, left: 0, right: 0, height: 30,
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      height: 30,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -592,13 +606,14 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontWeight: FontWeight.w800, // Сделали шрифт чуть жирнее
+                        fontWeight:
+                            FontWeight.w800, // Сделали шрифт чуть жирнее
                         fontSize: 15,
                         letterSpacing: -0.3,
                         color: Colors.black87,
                       ),
                     ),
-                    
+
                     // Категория и цвет
                     Row(
                       children: [
@@ -608,7 +623,9 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                           decoration: BoxDecoration(
                             color: item.color.length == 8
                                 ? Color(int.parse(item.color, radix: 16))
-                                : Colors.grey.shade300, // Дефолтный цвет светлее
+                                : Colors
+                                      .grey
+                                      .shade300, // Дефолтный цвет светлее
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: Colors.grey.shade300,
@@ -631,21 +648,28 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                         ),
                       ],
                     ),
-                    
+
                     // Теги (Погода и Стиль)
                     Row(
                       children: [
                         // Плашка погоды
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                            color: Theme.of(
+                              context,
+                            ).primaryColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Icon(
                             item.warmthLevel == 3
                                 ? Icons.ac_unit_rounded
-                                : (item.warmthLevel == 1 ? Icons.wb_sunny_rounded : Icons.cloud_queue_rounded),
+                                : (item.warmthLevel == 1
+                                      ? Icons.wb_sunny_rounded
+                                      : Icons.cloud_queue_rounded),
                             size: 14,
                             color: Theme.of(context).primaryColor,
                           ),
@@ -654,7 +678,10 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                         // Плашка стиля
                         Expanded(
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.grey.shade100,
                               borderRadius: BorderRadius.circular(8),

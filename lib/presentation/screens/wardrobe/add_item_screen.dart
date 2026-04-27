@@ -38,7 +38,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
   final List<String> _categories = AppConstants.categories;
   final List<String> _styles = AppConstants.styles;
 
-  final Map<String, List<String>> _subCategoriesMap = AppConstants.subCategoriesMap;
+  final Map<String, List<String>> _subCategoriesMap =
+      AppConstants.subCategoriesMap;
 
   @override
   void initState() {
@@ -81,34 +82,35 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
     setState(() => _isScanning = true);
 
-    // Вызываем наш сервис
-    final result = await AiScannerService.analyzeImage(_imageFile!);
+    try {
+      final result = await AiScannerService.analyzeImage(_imageFile!);
 
-    setState(() => _isScanning = false);
-
-    if (result != null) {
-      setState(() {
-        if (result['name'] != null) _nameController.text = result['name']; 
-
-        // Обновляем состояния, если ИИ вернул не null
-        if (result['category'] != null) _selectedCategory = result['category'];
-        
-        // Сбрасываем подкатегорию, чтобы не было конфликтов, затем ставим новую
-        _selectedSubCategory = null; 
-        if (result['subCategory'] != null) _selectedSubCategory = result['subCategory'];
-        
-        if (result['style'] != null) _selectedStyle = result['style'];
-        if (result['warmthLevel'] != null) _warmthLevel = result['warmthLevel'].toDouble();
-        
-        // Парсим цвет
-        if (result['colorHex'] != null) {
-          _currentColor = Color(int.parse(result['colorHex'], radix: 16));
-        }
-      });
-      
-      AppSnackBar.showSuccess(context, 'Вещь распознана!');
-    } else {
-      AppSnackBar.showError(context, 'Не удалось распознать вещь');
+      if (result != null) {
+        setState(() {
+          if (result['name'] != null) _nameController.text = result['name'];
+          if (result['category'] != null)
+            _selectedCategory = result['category'];
+          _selectedSubCategory = null;
+          if (result['subCategory'] != null)
+            _selectedSubCategory = result['subCategory'];
+          if (result['style'] != null) _selectedStyle = result['style'];
+          if (result['warmthLevel'] != null)
+            _warmthLevel = result['warmthLevel'].toDouble();
+          if (result['colorHex'] != null) {
+            _currentColor = Color(int.parse(result['colorHex'], radix: 16));
+          }
+        });
+        AppSnackBar.showSuccess(context, 'Вещь распознана!');
+      } else {
+        AppSnackBar.showError(context, 'Не удалось распознать вещь');
+      }
+    } on Exception catch (e) {
+      AppSnackBar.showError(
+        context,
+        'Ошибка: ${e.toString().replaceFirst('Exception: ', '')}',
+      );
+    } finally {
+      setState(() => _isScanning = false);
     }
   }
 
@@ -219,7 +221,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
     final isEditing = widget.itemToEdit != null; // [cite: 528]
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA), // Фирменный фон 
+      backgroundColor: const Color(0xFFF5F7FA), // Фирменный фон
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -268,7 +270,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(24), // В стиле OutfitCard
               border: _imageFile == null && _existingImagePath == null
-                  ? Border.all(color: Colors.grey.shade300, style: BorderStyle.solid) //
+                  ? Border.all(
+                      color: Colors.grey.shade300,
+                      style: BorderStyle.solid,
+                    ) //
                   : null,
               boxShadow: [
                 BoxShadow(
@@ -282,34 +287,46 @@ class _AddItemScreenState extends State<AddItemScreen> {
             child: _imageFile != null
                 ? Image.file(_imageFile!, fit: BoxFit.cover)
                 : (_existingImagePath != null
-                    ? Image.file(File(_existingImagePath!), fit: BoxFit.cover)
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add_a_photo_outlined, size: 48, color: Colors.grey.shade400),
-                          const SizedBox(height: 12),
-                          Text(
-                            "Нажмите, чтобы добавить фото",
-                            style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
-                          ),
-                        ],
-                      )),
+                      ? Image.file(File(_existingImagePath!), fit: BoxFit.cover)
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add_a_photo_outlined,
+                              size: 48,
+                              color: Colors.grey.shade400,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              "Нажмите, чтобы добавить фото",
+                              style: TextStyle(
+                                color: Colors.grey.shade500,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        )),
           ),
         ),
         const SizedBox(height: 16),
-        
+
         // ИСПРАВЛЕНО: Кнопка AI-сканирования теперь с видимым фоном-градиентом
         Container(
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF4A90E2), Color(0xFF002984)], // Наш фирменный градиент
+              colors: [
+                Color(0xFF4A90E2),
+                Color(0xFF002984),
+              ], // Наш фирменный градиент
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF4A90E2).withValues(alpha: 0.3), // Легкое свечение
+                color: const Color(
+                  0xFF4A90E2,
+                ).withValues(alpha: 0.3), // Легкое свечение
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -317,25 +334,33 @@ class _AddItemScreenState extends State<AddItemScreen> {
           ),
           child: ElevatedButton.icon(
             onPressed: _isScanning ? null : _scanItem,
-            icon: _isScanning 
+            icon: _isScanning
                 ? const SizedBox(
-                    width: 20, 
-                    height: 20, 
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
                   )
                 : const Icon(Icons.auto_awesome, color: Colors.white),
             label: Text(
               _isScanning ? "ИИ анализирует..." : "Распознать с помощью ИИ",
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-              backgroundColor: Colors.transparent, // Фон прозрачный, чтобы было видно градиент контейнера
-              shadowColor: Colors.transparent, // Убираем стандартную тень кнопки, т.к. есть тень у контейнера
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            ).copyWith(
-              elevation: WidgetStateProperty.all(0),
-            ),
+              backgroundColor: Colors
+                  .transparent, // Фон прозрачный, чтобы было видно градиент контейнера
+              shadowColor: Colors
+                  .transparent, // Убираем стандартную тень кнопки, т.к. есть тень у контейнера
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ).copyWith(elevation: WidgetStateProperty.all(0)),
           ),
         ),
       ],
@@ -348,10 +373,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24), // 
+        borderRadius: BorderRadius.circular(24), //
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03), // 
+            color: Colors.black.withValues(alpha: 0.03), //
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -362,7 +387,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Название", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const Text(
+              "Название",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
             const SizedBox(height: 8),
             TextFormField(
               controller: _nameController, // [cite: 519]
@@ -383,25 +411,30 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   borderSide: BorderSide(color: Theme.of(context).primaryColor),
                 ),
               ),
-              validator: (value) => value == null || value.isEmpty ? 'Введите название' : null,
+              validator: (value) =>
+                  value == null || value.isEmpty ? 'Введите название' : null,
             ),
             const SizedBox(height: 20),
-            
-            CustomDropdown( // [cite: 550]
+
+            CustomDropdown(
+              // [cite: 550]
               label: 'Категория',
               value: _selectedCategory,
               items: _categories.cast<String>(), // [cite: 522]
               onChanged: (val) {
-                if (val != null) setState(() {
-                  _selectedCategory = val;
-                  _selectedSubCategory = _subCategoriesMap[val]?.first; // [cite: 522]
-                });
+                if (val != null)
+                  setState(() {
+                    _selectedCategory = val;
+                    _selectedSubCategory =
+                        _subCategoriesMap[val]?.first; // [cite: 522]
+                  });
               },
             ),
             const SizedBox(height: 20),
 
             if (_selectedSubCategory != null) ...[
-              CustomDropdown( // [cite: 550]
+              CustomDropdown(
+                // [cite: 550]
                 label: 'Подкатегория',
                 value: _selectedSubCategory!,
                 items: _subCategoriesMap[_selectedCategory] ?? [],
@@ -412,7 +445,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
               const SizedBox(height: 20),
             ],
 
-            CustomDropdown( // [cite: 550]
+            CustomDropdown(
+              // [cite: 550]
               label: 'Стиль',
               value: _selectedStyle,
               items: _styles.cast<String>(), // [cite: 522]
@@ -429,7 +463,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Цвет", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      const Text(
+                        "Цвет",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       GestureDetector(
                         onTap: _showColorPicker, // [cite: 525]
@@ -438,7 +478,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
                           decoration: BoxDecoration(
                             color: _currentColor, // [cite: 521]
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.grey.shade300, width: 2),
+                            border: Border.all(
+                              color: Colors.grey.shade300,
+                              width: 2,
+                            ),
                           ),
                         ),
                       ),
@@ -447,9 +490,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: CustomDropdown( // [cite: 550]
+                  child: CustomDropdown(
+                    // [cite: 550]
                     label: 'Сезон',
-                    value: _warmthLevel == 1 ? 'Лето' : (_warmthLevel == 2 ? 'Деми' : 'Зима'), // [cite: 541, 542]
+                    value: _warmthLevel == 1
+                        ? 'Лето'
+                        : (_warmthLevel == 2
+                              ? 'Деми'
+                              : 'Зима'), // [cite: 541, 542]
                     items: const ['Лето', 'Деми', 'Зима'],
                     onChanged: (val) {
                       setState(() {
@@ -472,7 +520,8 @@ class _AddItemScreenState extends State<AddItemScreen> {
   Widget _buildSaveButton(bool isEditing) {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient( // Фирменный градиент 
+        gradient: const LinearGradient(
+          // Фирменный градиент
           colors: [Color(0xFF4A90E2), Color(0xFF002984)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -480,7 +529,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A90E2).withValues(alpha: 0.4), // 
+            color: const Color(0xFF4A90E2).withValues(alpha: 0.4), //
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -492,7 +541,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
           padding: const EdgeInsets.symmetric(vertical: 18),
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
         child: Text(
           isEditing ? "Сохранить изменения" : "Добавить в гардероб",

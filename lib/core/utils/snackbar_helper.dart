@@ -95,7 +95,7 @@ class _AnimatedTopToastState extends State<_AnimatedTopToast>
 
     _controller.forward();
 
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 4), () {
       if (mounted) {
         _controller.reverse().then((_) => widget.onDismissed());
       }

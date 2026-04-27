@@ -90,11 +90,18 @@ ${jsonEncode(wardrobeJson)}
 
         return jsonDecode(cleanJson) as Map<String, dynamic>;
       } else {
-        throw Exception('Ошибка сервера: ${response.statusCode}');
+        String errorMsg = 'Ошибка сервера: ${response.statusCode}';
+        try {
+          final errorBody = jsonDecode(response.body);
+          if (errorBody is Map && errorBody.containsKey('error')) {
+            errorMsg = errorBody['error'];
+          }
+        } catch (_) {}
+        throw Exception(errorMsg);
       }
     } catch (e) {
       print('Ошибка Gemini API: $e');
-      return null;
+      rethrow;
     }
   }
 }

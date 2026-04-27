@@ -8,7 +8,6 @@ class AiScannerService {
 
   static Future<Map<String, dynamic>?> analyzeImage(File imageFile) async {
     try {
-      // Конвертируем фото в Base64
       final bytes = await imageFile.readAsBytes();
       final base64Image = base64Encode(bytes);
 
@@ -17,19 +16,26 @@ class AiScannerService {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'imageBase64': base64Image,
-          'mimeType': 'image/jpeg', // По умолчанию с камеры идет jpeg
+          'mimeType': 'image/jpeg',
         }),
       );
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
-        print('Ошибка сервера: ${response.statusCode}');
-        return null;
+        // Извлекаем сообщение об ошибке из ответа
+        String errorMsg = 'Ошибка сервера: ${response.statusCode}';
+        try {
+          final errorBody = jsonDecode(response.body);
+          if (errorBody is Map && errorBody.containsKey('error')) {
+            errorMsg = errorBody['error'];
+          }
+        } catch (_) {}
+        throw Exception(errorMsg);
       }
     } catch (e) {
       print('Ошибка при отправке запроса: $e');
-      return null;
+      rethrow; // пробрасываем, чтобы перехватить в UI
     }
   }
 }
