@@ -448,9 +448,10 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                     // Два разных состояния: фильтры активны vs гардероб реально пустой
                     final bool hasFilters = _activeFiltersCount > 0;
 
-                    return Center(
+                    return Align(
+                      alignment: const Alignment(0, -0.12),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
                             padding: const EdgeInsets.all(32),

@@ -27,6 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = false;
   String? _error;
 
+  bool _isWeatherFromCache = false;
+
   late String _currentCity;
 
   String _activity = 'Прогулка';
@@ -52,9 +54,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
-      final data = await _weatherService.getWeather(_currentCity);
+      final result = await _weatherService.getWeather(_currentCity);
       setState(() {
-        _weather = data;
+        _weather = result.forecast;
+        _isWeatherFromCache = result.isFromCache;
         _isLoading = false;
       });
     } catch (e) {
@@ -545,6 +548,7 @@ class _HomeScreenState extends State<HomeScreen> {
             forecast: _weather,
             isLoading: _isLoading,
             errorMessage: _error,
+            isOffline: _isWeatherFromCache, // <-- новое
             onChangeCity: _showCityDialog,
           ),
 

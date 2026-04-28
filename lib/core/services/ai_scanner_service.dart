@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class AiScannerService {
-  // Укажите URL вашего развернутого прокси (как в gemini_service.dart)
   static const String _baseUrl = 'https://outfitmate-proxy-api.vercel.app';
 
   static Future<Map<String, dynamic>?> analyzeImage(File imageFile) async {
@@ -23,7 +22,6 @@ class AiScannerService {
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
-        // Извлекаем сообщение об ошибке из ответа
         String errorMsg = 'Ошибка сервера: ${response.statusCode}';
         try {
           final errorBody = jsonDecode(response.body);
@@ -33,9 +31,11 @@ class AiScannerService {
         } catch (_) {}
         throw Exception(errorMsg);
       }
+    } on SocketException catch (_) {
+      throw Exception('Нет подключения к интернету');
     } catch (e) {
       print('Ошибка при отправке запроса: $e');
-      rethrow; // пробрасываем, чтобы перехватить в UI
+      rethrow;
     }
   }
 }

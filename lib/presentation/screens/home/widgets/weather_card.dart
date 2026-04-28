@@ -6,6 +6,7 @@ class WeatherCard extends StatelessWidget {
   final VoidCallback onChangeCity;
   final bool isLoading;
   final String? errorMessage;
+  final bool isOffline;
 
   const WeatherCard({
     super.key,
@@ -13,6 +14,7 @@ class WeatherCard extends StatelessWidget {
     required this.onChangeCity,
     this.isLoading = false,
     this.errorMessage,
+    this.isOffline = false,
   });
 
   @override
@@ -62,6 +64,29 @@ class WeatherCard extends StatelessWidget {
               ),
             ],
           ),
+
+          if (isOffline)
+            Container(
+              margin: const EdgeInsets.only(top: 8, bottom: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white30),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.wifi_off_rounded, color: Colors.white70, size: 16),
+                  SizedBox(width: 6),
+                  Text(
+                    'Нет интернета · данные из кэша',
+                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+
           const SizedBox(height: 20),
 
           if (isLoading)
@@ -71,10 +96,32 @@ class WeatherCard extends StatelessWidget {
             )
           else if (errorMessage != null)
             Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Text(
-                "Ошибка: $errorMessage",
-                style: const TextStyle(color: Colors.white),
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: Column(
+                children: [
+                  const Icon(
+                    Icons.wifi_off_rounded,
+                    color: Colors.white54,
+                    size: 56, 
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Нет интернета',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 6), 
+                  const Text(
+                    'Погода недоступна — кэш пуст',
+                    style: TextStyle(
+                      color: Colors.white60,
+                      fontSize: 15,
+                    ),
+                  ),
+                ],
               ),
             )
           else if (forecast != null)

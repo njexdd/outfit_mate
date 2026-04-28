@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import '../../data/database/app_database.dart';
@@ -99,6 +100,8 @@ ${jsonEncode(wardrobeJson)}
         } catch (_) {}
         throw Exception(errorMsg);
       }
+    } on SocketException catch (_) {
+      throw Exception('Нет подключения к интернету');
     } catch (e) {
       print('Ошибка Gemini API: $e');
       // Пробрасываем дальше, чтобы вызывающий код мог перехватить
