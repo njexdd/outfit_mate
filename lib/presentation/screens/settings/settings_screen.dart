@@ -19,6 +19,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _style = UserPrefs.style;
   String _colorPalette = UserPrefs.colorPalette;
 
+  static const _primary = Color(0xFF4A90E2);
+  static const _primaryDark = Color(0xFF002984);
+
   void _updateSettings() {
     UserPrefs.setCity(_city);
     UserPrefs.setGender(_gender);
@@ -57,14 +60,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF4A90E2), Color(0xFF002984)],
+                      colors: [_primary, _primaryDark],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF4A90E2).withValues(alpha: 0.35),
+                        color: _primary.withValues(alpha: 0.35),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -85,14 +88,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF4A90E2), Color(0xFF002984)],
+                  colors: [_primary, _primaryDark],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4A90E2).withValues(alpha: 0.3),
+                    color: _primary.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 6),
                   ),
@@ -181,37 +184,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Чувствительность к холоду",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  // ── Слайдер чувствительности к холоду ─────────────────
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: _primary.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.thermostat_rounded,
+                          size: 20,
+                          color: _primary,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        "Чувствительность к холоду",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Slider(
-                    value: _coldSensitivity,
-                    min: 1,
-                    max: 3,
-                    divisions: 2,
-                    activeColor: Theme.of(context).primaryColor,
-                    onChanged: (val) => setState(() => _coldSensitivity = val),
-                    onChangeEnd: (val) => _updateSettings(),
+                  const SizedBox(height: 12),
+                  SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      activeTrackColor: _primary,
+                      inactiveTrackColor: Colors.grey.shade200,
+                      thumbColor: Colors.white,
+                      overlayColor: _primary.withValues(alpha: 0.15),
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 10,
+                        elevation: 4,
+                      ),
+                      trackHeight: 4,
+                    ),
+                    child: Slider(
+                      value: _coldSensitivity,
+                      min: 1,
+                      max: 3,
+                      divisions: 2,
+                      onChanged: (val) =>
+                          setState(() => _coldSensitivity = val),
+                      onChangeEnd: (val) => _updateSettings(),
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
-                      Text(
-                        "Мерзляк",
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                      Text(
-                        "Нормально",
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                      Text(
-                        "Жарко",
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
+                      Text("🥶 Мерзляк",
+                          style: TextStyle(color: Colors.grey, fontSize: 13)),
+                      Text("😊 Нормально",
+                          style: TextStyle(color: Colors.grey, fontSize: 13)),
+                      Text("🥵 Жарко",
+                          style: TextStyle(color: Colors.grey, fontSize: 13)),
                     ],
                   ),
+                  // ──────────────────────────────────────────────────────
                   const Divider(height: 32),
                   CustomDropdown(
                     label: "Предпочитаемый стиль",
