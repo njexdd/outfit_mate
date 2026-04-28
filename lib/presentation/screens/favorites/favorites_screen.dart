@@ -35,8 +35,18 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   String _formatPrettyDate(DateTime date) {
     const months = [
-      'Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня',
-      'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'
+      'Января',
+      'Февраля',
+      'Марта',
+      'Апреля',
+      'Мая',
+      'Июня',
+      'Июля',
+      'Августа',
+      'Сентября',
+      'Октября',
+      'Ноября',
+      'Декабря',
     ];
     return "${date.day} ${months[date.month - 1]}";
   }
@@ -91,11 +101,17 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF4A90E2), Color(0xFF002984)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
+                          color: const Color(
+                            0xFF4A90E2,
+                          ).withValues(alpha: 0.35),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -103,7 +119,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     ),
                     child: const Icon(
                       Icons.favorite_rounded,
-                      color: Color(0xFFFF4757),
+                      color: Colors.white,
                       size: 28,
                     ),
                   ),
@@ -120,7 +136,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
                           return const Center(
-                              child: CircularProgressIndicator());
+                            child: CircularProgressIndicator(),
+                          );
                         }
 
                         final outfits = snapshot.data!;
@@ -138,8 +155,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFFFF4757)
-                                            .withValues(alpha: 0.1),
+                                        color: const Color(
+                                          0xFFFF4757,
+                                        ).withValues(alpha: 0.1),
                                         blurRadius: 24,
                                         offset: const Offset(0, 12),
                                       ),
@@ -203,11 +221,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       itemsInOutfit.add(_itemsMap[outfit.bottomId]!);
     if (outfit.shoesId != null && _itemsMap.containsKey(outfit.shoesId))
       itemsInOutfit.add(_itemsMap[outfit.shoesId]!);
-    if (outfit.outerwearId != null &&
-        _itemsMap.containsKey(outfit.outerwearId))
+    if (outfit.outerwearId != null && _itemsMap.containsKey(outfit.outerwearId))
       itemsInOutfit.add(_itemsMap[outfit.outerwearId]!);
-    if (outfit.accessoryId != null &&
-        _itemsMap.containsKey(outfit.accessoryId))
+    if (outfit.accessoryId != null && _itemsMap.containsKey(outfit.accessoryId))
       itemsInOutfit.add(_itemsMap[outfit.accessoryId]!);
 
     return Container(
@@ -259,10 +275,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         // Плашка с датой (акцент — красный для избранного)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFF4757)
-                                .withValues(alpha: 0.08),
+                            color: const Color(
+                              0xFFFF4757,
+                            ).withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -324,8 +343,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFF4757)
-                                  .withValues(alpha: 0.08),
+                              color: const Color(
+                                0xFFFF4757,
+                              ).withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Icon(
@@ -349,7 +369,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       const SizedBox(height: 10),
                       Container(
                         padding: const EdgeInsets.only(
-                            left: 14, top: 4, bottom: 4),
+                          left: 14,
+                          top: 4,
+                          bottom: 4,
+                        ),
                         decoration: const BoxDecoration(
                           border: Border(
                             left: BorderSide(
@@ -358,8 +381,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                             ),
                           ),
                         ),
-                        child: ExpandableDescription(
-                            text: outfit.description!),
+                        child: ExpandableDescription(text: outfit.description!),
                       ),
                     ],
                   ],
@@ -405,8 +427,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     final warmthIcon = item.warmthLevel == 3
         ? Icons.ac_unit_rounded
         : (item.warmthLevel == 1
-            ? Icons.wb_sunny_rounded
-            : Icons.cloud_queue_rounded);
+              ? Icons.wb_sunny_rounded
+              : Icons.cloud_queue_rounded);
 
     return Container(
       decoration: BoxDecoration(
@@ -524,10 +546,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 3),
+                          horizontal: 5,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFF4757)
-                              .withValues(alpha: 0.08),
+                          color: const Color(
+                            0xFFFF4757,
+                          ).withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(7),
                         ),
                         child: Icon(
@@ -540,7 +565,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 3),
+                            horizontal: 6,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(7),

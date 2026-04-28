@@ -68,13 +68,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showCityDialog() {
     String searchQuery = '';
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (ctx) => Dialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        elevation: 10,
-        child: StatefulBuilder(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
             final filteredCities = AppConstants.belarusCities
                 .where(
@@ -83,34 +82,97 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
                 .toList();
 
-            return Padding(
-              padding: const EdgeInsets.all(24.0),
+            final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
+            return Container(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: 20 + keyboardHeight,
+              ),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Ваш город",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  // ── Drag-индикатор ──────────────────────────────────
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Выберите город из списка.",
-                    style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                  ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
-                  // Поле поиска (только фильтрация, не свободный ввод)
+                  // ── Заголовок с иконкой ─────────────────────────────
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF4A90E2), Color(0xFF002984)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(
+                                0xFF4A90E2,
+                              ).withValues(alpha: 0.35),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.location_on_rounded,
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Ваш город",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            "Выберите город из списка",
+                            style: TextStyle(
+                              color: Colors.grey.shade500,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // ── Поле поиска ─────────────────────────────────────
                   TextField(
                     onChanged: (value) {
-                      setModalState(() {
-                        searchQuery = value;
-                      });
+                      setModalState(() => searchQuery = value);
                     },
                     decoration: InputDecoration(
                       hintText: "Поиск города...",
                       prefixIcon: Icon(
-                        Icons.search,
+                        Icons.search_rounded,
                         color: Theme.of(context).primaryColor,
                       ),
                       filled: true,
@@ -135,8 +197,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Быстрые чипы (только когда поиск пуст)
-                  if (searchQuery.isEmpty) ...[
+                  // ── Быстрые чипы (только при закрытой клавиатуре) ───
+                  if (searchQuery.isEmpty && keyboardHeight == 0) ...[
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       physics: const BouncingScrollPhysics(),
@@ -150,43 +212,79 @@ class _HomeScreenState extends State<HomeScreen> {
                               'Гродно',
                               'Могилев',
                             ].map((city) {
+                              final isSelected = city == _currentCity;
                               return Padding(
                                 padding: const EdgeInsets.only(right: 8.0),
-                                child: ActionChip(
-                                  label: Text(
-                                    city,
-                                    style: TextStyle(
-                                      color: Colors.grey.shade800,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  backgroundColor: Colors.grey.shade100,
-                                  side: BorderSide.none,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  onPressed: () {
-                                    // Сразу применяем выбор без кнопки «Сохранить»
+                                child: GestureDetector(
+                                  onTap: () {
                                     setState(() => _currentCity = city);
                                     UserPrefs.setCity(city);
                                     Navigator.pop(ctx);
                                     _loadWeather();
                                   },
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 8,
+                                      horizontal: 16,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: isSelected
+                                          ? const LinearGradient(
+                                              colors: [
+                                                Color(0xFF4A90E2),
+                                                Color(0xFF002984),
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            )
+                                          : null,
+                                      color: isSelected
+                                          ? null
+                                          : Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: isSelected
+                                          ? [
+                                              BoxShadow(
+                                                color: const Color(
+                                                  0xFF4A90E2,
+                                                ).withValues(alpha: 0.35),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ]
+                                          : [],
+                                    ),
+                                    child: Text(
+                                      city,
+                                      style: TextStyle(
+                                        color: isSelected
+                                            ? Colors.white
+                                            : Colors.grey.shade800,
+                                        fontWeight: isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.w500,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               );
                             }).toList(),
                       ),
                     ),
+                    const SizedBox(height: 16),
                   ],
 
-                  // Список городов (всегда показывается при поиске, и по умолчанию)
-                  const SizedBox(height: 8),
+                  // ── Список городов ──────────────────────────────────
                   ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 200),
+                    constraints: BoxConstraints(
+                      maxHeight: keyboardHeight > 0 ? 130.0 : 220.0,
+                    ),
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.grey.shade50,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: Colors.grey.shade200),
                       ),
                       child: MediaQuery.removePadding(
@@ -195,41 +293,76 @@ class _HomeScreenState extends State<HomeScreen> {
                         removeBottom: true,
                         child: filteredCities.isEmpty
                             ? Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Text(
-                                  'Город не найден',
-                                  style: TextStyle(color: Colors.grey.shade500),
+                                padding: const EdgeInsets.all(20.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.search_off_rounded,
+                                      color: Colors.grey.shade400,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      'Город не найден',
+                                      style: TextStyle(
+                                        color: Colors.grey.shade500,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               )
-                            : ListView.builder(
+                            : ListView.separated(
                                 shrinkWrap: true,
                                 physics: const BouncingScrollPhysics(),
                                 itemCount: filteredCities.length,
+                                separatorBuilder: (_, __) => Divider(
+                                  height: 1,
+                                  color: Colors.grey.shade200,
+                                  indent: 16,
+                                  endIndent: 16,
+                                ),
                                 itemBuilder: (context, index) {
                                   final city = filteredCities[index];
                                   final isSelected = city == _currentCity;
                                   return ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 2,
+                                    ),
                                     title: Text(
                                       city,
                                       style: TextStyle(
                                         fontWeight: FontWeight.w500,
                                         color: isSelected
                                             ? Theme.of(context).primaryColor
-                                            : null,
+                                            : Colors.black87,
                                       ),
                                     ),
                                     trailing: isSelected
-                                        ? Icon(
-                                            Icons.check,
-                                            color: Theme.of(
-                                              context,
-                                            ).primaryColor,
-                                            size: 18,
+                                        ? Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: BoxDecoration(
+                                              gradient: const LinearGradient(
+                                                colors: [
+                                                  Color(0xFF4A90E2),
+                                                  Color(0xFF002984),
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
+                                              ),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.check,
+                                              color: Colors.white,
+                                              size: 14,
+                                            ),
                                           )
-                                        : const Icon(
-                                            Icons.arrow_outward,
+                                        : Icon(
+                                            Icons.arrow_outward_rounded,
                                             size: 16,
-                                            color: Colors.grey,
+                                            color: Colors.grey.shade400,
                                           ),
                                     onTap: () {
                                       setState(() => _currentCity = city);
@@ -244,32 +377,38 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
 
-                  // Только кнопка «Отмена» — выбор происходит по тапу на город
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    style: TextButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                  // ── Кнопка «Отмена» ─────────────────────────────────
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.grey.shade100,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
-                    ),
-                    child: const Text(
-                      "Отмена",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                      child: const Text(
+                        "Отмена",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
+
+                  SizedBox(height: MediaQuery.of(context).padding.bottom),
                 ],
               ),
             );
           },
-        ),
-      ),
+        );
+      },
     );
   }
 

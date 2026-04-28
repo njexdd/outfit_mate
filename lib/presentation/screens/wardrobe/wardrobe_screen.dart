@@ -360,19 +360,25 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF4A90E2), Color(0xFF002984)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
+                          color: const Color(
+                            0xFF4A90E2,
+                          ).withValues(alpha: 0.35),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.checkroom,
-                      color: Theme.of(context).primaryColor,
+                      color: Colors.white,
                       size: 28,
                     ),
                   ),

@@ -35,8 +35,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   String _formatPrettyDate(DateTime date) {
     const months = [
-      'Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня',
-      'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'
+      'Января',
+      'Февраля',
+      'Марта',
+      'Апреля',
+      'Мая',
+      'Июня',
+      'Июля',
+      'Августа',
+      'Сентября',
+      'Октября',
+      'Ноября',
+      'Декабря',
     ];
     return "${date.day} ${months[date.month - 1]}";
   }
@@ -98,19 +108,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF4A90E2), Color(0xFF002984)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
+                          color: const Color(
+                            0xFF4A90E2,
+                          ).withValues(alpha: 0.35),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.history_rounded,
-                      color: Theme.of(context).primaryColor,
+                      color: Colors.white,
                       size: 28,
                     ),
                   ),
@@ -126,7 +142,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       stream: db.watchAllOutfits(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
 
                         final outfits = snapshot.data!;
@@ -144,9 +162,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                     shape: BoxShape.circle,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Theme.of(context)
-                                            .primaryColor
-                                            .withValues(alpha: 0.1),
+                                        color: Theme.of(
+                                          context,
+                                        ).primaryColor.withValues(alpha: 0.1),
                                         blurRadius: 24,
                                         offset: const Offset(0, 12),
                                       ),
@@ -186,7 +204,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
                           physics: const BouncingScrollPhysics(),
                           itemCount: outfits.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 20),
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 20),
                           itemBuilder: (context, index) {
                             final outfit = outfits[index];
                             return _buildHistoryCard(outfit);
@@ -249,9 +268,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: Icon(
                     Icons.format_quote_rounded,
                     size: 70,
-                    color: Theme.of(context)
-                        .primaryColor
-                        .withValues(alpha: 0.04),
+                    color: Theme.of(
+                      context,
+                    ).primaryColor.withValues(alpha: 0.04),
                   ),
                 ),
 
@@ -265,11 +284,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                         // Плашка с датой
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
                           decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .primaryColor
-                                .withValues(alpha: 0.1),
+                            color: Theme.of(
+                              context,
+                            ).primaryColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
@@ -303,7 +324,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   duration: const Duration(milliseconds: 300),
                                   transitionBuilder: (child, anim) =>
                                       ScaleTransition(
-                                          scale: anim, child: child),
+                                        scale: anim,
+                                        child: child,
+                                      ),
                                   child: Icon(
                                     outfit.isFavorite
                                         ? Icons.favorite_rounded
@@ -342,9 +365,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .primaryColor
-                                  .withValues(alpha: 0.1),
+                              color: Theme.of(
+                                context,
+                              ).primaryColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
@@ -368,7 +391,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       const SizedBox(height: 10),
                       Container(
                         padding: const EdgeInsets.only(
-                            left: 14, top: 4, bottom: 4),
+                          left: 14,
+                          top: 4,
+                          bottom: 4,
+                        ),
                         decoration: BoxDecoration(
                           border: Border(
                             left: BorderSide(
@@ -377,8 +403,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             ),
                           ),
                         ),
-                        child: ExpandableDescription(
-                            text: outfit.description!),
+                        child: ExpandableDescription(text: outfit.description!),
                       ),
                     ],
                   ],
@@ -425,8 +450,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     final warmthIcon = item.warmthLevel == 3
         ? Icons.ac_unit_rounded
         : (item.warmthLevel == 1
-            ? Icons.wb_sunny_rounded
-            : Icons.cloud_queue_rounded);
+              ? Icons.wb_sunny_rounded
+              : Icons.cloud_queue_rounded);
 
     return Container(
       decoration: BoxDecoration(
@@ -544,11 +569,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 3),
+                          horizontal: 5,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .primaryColor
-                              .withValues(alpha: 0.1),
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(7),
                         ),
                         child: Icon(
@@ -561,7 +588,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       Expanded(
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 3),
+                            horizontal: 6,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(7),
