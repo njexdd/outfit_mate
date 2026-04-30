@@ -149,6 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     label: "Город",
                     value: _city,
                     items: AppConstants.belarusCities,
+                    searchable: true,
                     onChanged: (val) {
                       setState(() => _city = val!);
                       _updateSettings();

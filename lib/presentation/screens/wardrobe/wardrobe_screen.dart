@@ -18,7 +18,7 @@ class WardrobeScreen extends StatefulWidget {
 class _WardrobeScreenState extends State<WardrobeScreen> {
   String _filterCategory = 'Все';
   String? _filterStyle;
-  int? _filterWarmth;
+  Set<int> _filterWarmths = {};
 
   final List<String> _categories = ['Все', ...AppConstants.categories];
   final List<String> _styles = AppConstants.styles;
@@ -34,8 +34,9 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
             if (_filterStyle != null) {
               predicate = predicate & t.style.equals(_filterStyle!);
             }
-            if (_filterWarmth != null) {
-              predicate = predicate & t.warmthLevel.equals(_filterWarmth!);
+            if (_filterWarmths.isNotEmpty) {
+              predicate =
+                  predicate & t.warmthLevel.isIn(_filterWarmths.toList());
             }
             return predicate;
           })
@@ -52,16 +53,17 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
     int count = 0;
     if (_filterCategory != 'Все') count++;
     if (_filterStyle != null) count++;
-    if (_filterWarmth != null) count++;
+    if (_filterWarmths.isNotEmpty) count++;
     return count;
   }
 
   String _getFilterSummary() {
     List<String> active = [];
     if (_filterCategory != 'Все') active.add(_filterCategory);
-    if (_filterWarmth == 1) active.add('Лето');
-    if (_filterWarmth == 2) active.add('Деми');
-    if (_filterWarmth == 3) active.add('Зима');
+    const warmthLabels = {1: 'Лето', 2: 'Деми', 3: 'Зима'};
+    for (final w in _filterWarmths) {
+      if (warmthLabels.containsKey(w)) active.add(warmthLabels[w]!);
+    }
     if (_filterStyle != null) active.add(_filterStyle!);
 
     if (active.isEmpty) return 'Все вещи';
@@ -71,7 +73,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
   void _showFilterBottomSheet() {
     String tempCategory = _filterCategory;
     String? tempStyle = _filterStyle;
-    int? tempWarmth = _filterWarmth;
+    Set<int> tempWarmths = Set.from(_filterWarmths);
 
     showModalBottomSheet(
       context: context,
@@ -110,7 +112,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                             setModalState(() {
                               tempCategory = 'Все';
                               tempStyle = null;
-                              tempWarmth = null;
+                              tempWarmths = {};
                             });
                           },
                           child: const Text(
@@ -152,23 +154,32 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                     Wrap(
                       spacing: 8,
                       children: [
-                        _buildFilterChip(
+                        _buildMultiFilterChip(
                           "Лето",
                           1,
-                          tempWarmth,
-                          (v) => setModalState(() => tempWarmth = v ? 1 : null),
+                          tempWarmths,
+                          (v) => setModalState(
+                            () =>
+                                v ? tempWarmths.add(1) : tempWarmths.remove(1),
+                          ),
                         ),
-                        _buildFilterChip(
+                        _buildMultiFilterChip(
                           "Демисезон",
                           2,
-                          tempWarmth,
-                          (v) => setModalState(() => tempWarmth = v ? 2 : null),
+                          tempWarmths,
+                          (v) => setModalState(
+                            () =>
+                                v ? tempWarmths.add(2) : tempWarmths.remove(2),
+                          ),
                         ),
-                        _buildFilterChip(
+                        _buildMultiFilterChip(
                           "Зима",
                           3,
-                          tempWarmth,
-                          (v) => setModalState(() => tempWarmth = v ? 3 : null),
+                          tempWarmths,
+                          (v) => setModalState(
+                            () =>
+                                v ? tempWarmths.add(3) : tempWarmths.remove(3),
+                          ),
                         ),
                       ],
                     ),
@@ -222,7 +233,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                           setState(() {
                             _filterCategory = tempCategory;
                             _filterStyle = tempStyle;
-                            _filterWarmth = tempWarmth;
+                            _filterWarmths = tempWarmths;
                           });
                           Navigator.pop(context);
                         },
@@ -295,6 +306,62 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMultiFilterChip(
+    String label,
+    int value,
+    Set<int> selectedValues,
+    Function(bool) onSelected,
+  ) {
+    final isSelected = selectedValues.contains(value);
+    return GestureDetector(
+      onTap: () => onSelected(!isSelected),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? null : Colors.white,
+          gradient: isSelected
+              ? const LinearGradient(
+                  colors: [Color(0xFF4A90E2), Color(0xFF002984)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          borderRadius: BorderRadius.circular(12),
+          border: isSelected
+              ? null
+              : Border.all(color: Colors.grey.shade300, width: 1.5),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF4A90E2).withValues(alpha: 0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ]
+              : [],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isSelected) ...[
+              const Icon(Icons.check, color: Colors.white, size: 14),
+              const SizedBox(width: 5),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.black87,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 13,
+              ),
+            ),
+          ],
         ),
       ),
     );

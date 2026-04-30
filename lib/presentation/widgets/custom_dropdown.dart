@@ -5,6 +5,7 @@ class CustomDropdown extends StatefulWidget {
   final List<String> items;
   final Function(String?) onChanged;
   final String label;
+  final bool searchable; // NEW: включает поиск в списке
 
   const CustomDropdown({
     super.key,
@@ -12,6 +13,7 @@ class CustomDropdown extends StatefulWidget {
     required this.items,
     required this.onChanged,
     this.label = '',
+    this.searchable = false, // по умолчанию — без поиска
   });
 
   @override
@@ -24,6 +26,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
   OverlayEntry? _overlayEntry;
 
   static const double _itemHeight = 48.0;
+  static const double _searchBarHeight = 52.0; // высота строки поиска
   static const double _maxMenuHeight = 300.0;
 
   @override
@@ -33,7 +36,6 @@ class _CustomDropdownState extends State<CustomDropdown> {
   }
 
   void _removeOverlay() {
-    // Запускаем анимацию закрытия, которая затем вызовет onClosed и удалит оверлей
     _menuKey.currentState?.close();
   }
 
@@ -48,8 +50,13 @@ class _CustomDropdownState extends State<CustomDropdown> {
     final buttonSize = buttonBox.size;
     final buttonPosition = buttonBox.localToGlobal(Offset.zero);
 
-    final double menuHeight =
+    // Учитываем высоту строки поиска при расчёте высоты меню
+    final double listHeight =
         (widget.items.length * _itemHeight).clamp(0.0, _maxMenuHeight);
+    final double menuHeight = widget.searchable
+        ? (listHeight + _searchBarHeight).clamp(0.0, _maxMenuHeight + _searchBarHeight)
+        : listHeight;
+
     final double screenHeight = MediaQuery.of(context).size.height;
     final double topSafeArea = MediaQuery.of(context).padding.top;
     final double bottomSafeArea = MediaQuery.of(context).padding.bottom;
@@ -63,21 +70,22 @@ class _CustomDropdownState extends State<CustomDropdown> {
     final bool openBelow = fitsBelow || !fitsAbove;
 
     final menu = _DropdownMenu(
-      key: _menuKey,   // <-- ключ для доступа к состоянию
+      key: _menuKey,
       items: widget.items,
       selectedValue: widget.value,
       menuHeight: menuHeight,
       openBelow: openBelow,
       buttonPosition: buttonPosition,
       buttonWidth: buttonSize.width,
+      searchable: widget.searchable,
       onChanged: (value) {
         widget.onChanged(value);
-        _menuKey.currentState?.close(); // закрываем меню после выбора
+        _menuKey.currentState?.close();
       },
       onClosed: () {
         _overlayEntry?.remove();
         _overlayEntry = null;
-        setState(() {}); // обновить стрелку
+        setState(() {});
       },
     );
 
@@ -85,7 +93,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
       builder: (context) => Stack(
         children: [
           GestureDetector(
-            onTap: _removeOverlay, // закрытие по тапу вне меню
+            onTap: _removeOverlay,
             behavior: HitTestBehavior.translucent,
             child: Container(color: Colors.transparent),
           ),
@@ -95,7 +103,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
     );
 
     Overlay.of(context).insert(_overlayEntry!);
-    setState(() {}); // стрелка вверх
+    setState(() {});
   }
 
   @override
@@ -118,7 +126,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
           key: _buttonKey,
           onTap: _toggleDropdown,
           child: Container(
-            height: 48, // фиксированная высота как у стандартного DropdownButton
+            height: 48,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -159,7 +167,9 @@ class _CustomDropdownState extends State<CustomDropdown> {
   }
 }
 
-// Внутренний виджет меню с анимацией
+// ─────────────────────────────────────────────────────────────────────────────
+// Внутренний виджет меню с анимацией и опциональным поиском
+// ─────────────────────────────────────────────────────────────────────────────
 class _DropdownMenu extends StatefulWidget {
   final List<String> items;
   final String selectedValue;
@@ -169,6 +179,7 @@ class _DropdownMenu extends StatefulWidget {
   final double buttonWidth;
   final ValueChanged<String> onChanged;
   final VoidCallback onClosed;
+  final bool searchable;
 
   const _DropdownMenu({
     super.key,
@@ -180,6 +191,7 @@ class _DropdownMenu extends StatefulWidget {
     required this.buttonWidth,
     required this.onChanged,
     required this.onClosed,
+    this.searchable = false,
   });
 
   @override
@@ -194,9 +206,24 @@ class _DropdownMenuState extends State<_DropdownMenu>
 
   bool _isClosing = false;
 
+  // Поиск
+  final TextEditingController _searchController = TextEditingController();
+  List<String> _filteredItems = [];
+
   @override
   void initState() {
     super.initState();
+    _filteredItems = List.from(widget.items);
+
+    _searchController.addListener(() {
+      final query = _searchController.text.toLowerCase();
+      setState(() {
+        _filteredItems = widget.items
+            .where((item) => item.toLowerCase().contains(query))
+            .toList();
+      });
+    });
+
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
@@ -205,7 +232,6 @@ class _DropdownMenuState extends State<_DropdownMenu>
       parent: _animationController,
       curve: Curves.easeIn,
     );
-    // «Выезд» меню из кнопки
     final double startOffsetY = widget.openBelow ? -10.0 : 10.0;
     _slideAnimation = Tween<Offset>(
       begin: Offset(0, startOffsetY / widget.menuHeight),
@@ -217,27 +243,38 @@ class _DropdownMenuState extends State<_DropdownMenu>
     _animationController.forward();
   }
 
-  // Публичный метод для закрытия с анимацией
   void close() {
     if (_isClosing) return;
     _isClosing = true;
     _animationController.reverse().then((_) {
-      widget.onClosed(); // уведомляем родителя, чтобы удалил оверлей
+      widget.onClosed();
     });
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    const double itemHeight = 48.0;
+    const double searchBarHeight = 52.0; // padding 10+6 + field 36
+    const double emptyStateHeight = 48.0;
+    const double maxListHeight = 300.0;
+
+    // Динамическая высота списка — пересчитывается при каждом rebuild
+    final double listHeight = _filteredItems.isEmpty
+        ? emptyStateHeight
+        : (_filteredItems.length * itemHeight).clamp(0.0, maxListHeight);
+    final double totalHeight =
+        (widget.searchable ? searchBarHeight : 0) + listHeight;
+
     final screenHeight = MediaQuery.of(context).size.height;
-    // Точное позиционирование: стыкуемся к кнопке без зазоров
     final double? top = widget.openBelow
-        ? widget.buttonPosition.dy + 48 // высота кнопки
+        ? widget.buttonPosition.dy + 48
         : null;
     final double? bottom = widget.openBelow
         ? null
@@ -255,51 +292,110 @@ class _DropdownMenuState extends State<_DropdownMenu>
           child: Material(
             elevation: 8,
             borderRadius: BorderRadius.circular(16),
-            child: Container(
-              height: widget.menuHeight,
+            child: AnimatedContainer(
+              // Плавно анимируем изменение высоты при фильтрации
+              duration: const Duration(milliseconds: 150),
+              curve: Curves.easeOut,
+              height: totalHeight,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                itemCount: widget.items.length,
-                itemBuilder: (context, index) {
-                  final item = widget.items[index];
-                  final isSelected = item == widget.selectedValue;
-                  return InkWell(
-                    onTap: () => widget.onChanged(item),
-                    child: Container(
-                      height: 48,
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? Theme.of(context)
-                                .primaryColor
-                                .withValues(alpha: 0.1)
-                            : null,
-                        borderRadius: index == 0
-                            ? const BorderRadius.vertical(
-                                top: Radius.circular(16))
-                            : index == widget.items.length - 1
-                                ? const BorderRadius.vertical(
-                                    bottom: Radius.circular(16))
-                                : null,
-                      ),
-                      child: Text(
-                        item,
-                        style: TextStyle(
-                          color: isSelected
-                              ? Theme.of(context).primaryColor
-                              : Colors.black87,
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.w500,
+              child: Column(
+                children: [
+                  // ── Строка поиска (только при searchable: true) ──────────
+                  if (widget.searchable)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+                      child: SizedBox(
+                        height: 36,
+                        child: TextField(
+                          controller: _searchController,
+                          autofocus: true,
+                          style: const TextStyle(fontSize: 14),
+                          decoration: InputDecoration(
+                            hintText: 'Поиск...',
+                            hintStyle: TextStyle(
+                              color: Colors.grey.shade400,
+                              fontSize: 14,
+                            ),
+                            prefixIcon: Icon(
+                              Icons.search_rounded,
+                              size: 18,
+                              color: Colors.grey.shade400,
+                            ),
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 0),
+                            filled: true,
+                            fillColor: Colors.grey.shade100,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  );
-                },
+
+                  // ── Список городов ────────────────────────────────────────
+                  Expanded(
+                    child: _filteredItems.isEmpty
+                        ? Center(
+                            child: Text(
+                              'Ничего не найдено',
+                              style: TextStyle(
+                                color: Colors.grey.shade400,
+                                fontSize: 14,
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: EdgeInsets.zero,
+                            itemCount: _filteredItems.length,
+                            itemBuilder: (context, index) {
+                              final item = _filteredItems[index];
+                              final isSelected = item == widget.selectedValue;
+                              final isFirst = index == 0;
+                              final isLast = index == _filteredItems.length - 1;
+
+                              return InkWell(
+                                onTap: () => widget.onChanged(item),
+                                child: Container(
+                                  height: itemHeight,
+                                  alignment: Alignment.centerLeft,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? Theme.of(context)
+                                            .primaryColor
+                                            .withValues(alpha: 0.1)
+                                        : null,
+                                    borderRadius: isFirst && !widget.searchable
+                                        ? const BorderRadius.vertical(
+                                            top: Radius.circular(16))
+                                        : isLast
+                                            ? const BorderRadius.vertical(
+                                                bottom: Radius.circular(16))
+                                            : null,
+                                  ),
+                                  child: Text(
+                                    item,
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? Theme.of(context).primaryColor
+                                          : Colors.black87,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
             ),
           ),
