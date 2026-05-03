@@ -102,7 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Drag-индикатор ──────────────────────────────────
                   Center(
                     child: Container(
                       width: 40,
@@ -115,7 +114,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // ── Заголовок с иконкой ─────────────────────────────
                   Row(
                     children: [
                       Container(
@@ -167,7 +165,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  // ── Поле поиска ─────────────────────────────────────
                   TextField(
                     onChanged: (value) {
                       setModalState(() => searchQuery = value);
@@ -200,7 +197,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 16),
 
-                  // ── Быстрые чипы (только при закрытой клавиатуре) ───
                   if (searchQuery.isEmpty && keyboardHeight == 0) ...[
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
@@ -279,7 +275,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 16),
                   ],
 
-                  // ── Список городов ──────────────────────────────────
                   ConstrainedBox(
                     constraints: BoxConstraints(
                       maxHeight: keyboardHeight > 0 ? 130.0 : 220.0,
@@ -382,7 +377,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   const SizedBox(height: 20),
 
-                  // ── Кнопка «Отмена» ─────────────────────────────────
                   SizedBox(
                     width: double.infinity,
                     height: 52,
@@ -548,7 +542,7 @@ class _HomeScreenState extends State<HomeScreen> {
             forecast: _weather,
             isLoading: _isLoading,
             errorMessage: _error,
-            isOffline: _isWeatherFromCache, // <-- новое
+            isOffline: _isWeatherFromCache,
             onChangeCity: _showCityDialog,
           ),
 

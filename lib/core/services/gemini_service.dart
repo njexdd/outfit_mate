@@ -104,7 +104,6 @@ ${jsonEncode(wardrobeJson)}
       throw Exception('Нет подключения к интернету');
     } catch (e) {
       print('Ошибка Gemini API: $e');
-      // Пробрасываем дальше, чтобы вызывающий код мог перехватить
       rethrow;
     }
   }

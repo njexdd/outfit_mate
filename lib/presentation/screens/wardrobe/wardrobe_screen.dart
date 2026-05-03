@@ -512,7 +512,6 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                   final items = snapshot.data ?? [];
 
                   if (items.isEmpty) {
-                    // Два разных состояния: фильтры активны vs гардероб реально пустой
                     final bool hasFilters = _activeFiltersCount > 0;
 
                     return Align(
@@ -607,12 +606,12 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(
             24,
-          ), // Увеличено скругление для современного вида
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(
                 alpha: 0.06,
-              ), // Более глубокая и мягкая тень
+              ),
               blurRadius: 16,
               offset: const Offset(0, 6),
             ),
@@ -622,9 +621,8 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // 1. Изображение вещи
             Expanded(
-              flex: 5, // Пропорция картинки к тексту
+              flex: 5,
               child: Hero(
                 tag: 'item_${item.id}',
                 child: Stack(
@@ -642,7 +640,6 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                         ),
                       ),
                     ),
-                    // Легкий градиент для мягкого перехода к текстовой части
                     Positioned(
                       bottom: 0,
                       left: 0,
@@ -665,7 +662,6 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                 ),
               ),
             ),
-            // 2. Информационная часть
             Expanded(
               flex: 4,
               child: Padding(
@@ -674,21 +670,19 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Название вещи
                     Text(
                       item.name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontWeight:
-                            FontWeight.w800, // Сделали шрифт чуть жирнее
+                            FontWeight.w800,
                         fontSize: 15,
                         letterSpacing: -0.3,
                         color: Colors.black87,
                       ),
                     ),
 
-                    // Категория и цвет
                     Row(
                       children: [
                         Container(
@@ -699,7 +693,7 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                                 ? Color(int.parse(item.color, radix: 16))
                                 : Colors
                                       .grey
-                                      .shade300, // Дефолтный цвет светлее
+                                      .shade300,
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: Colors.grey.shade300,
@@ -723,10 +717,8 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                       ],
                     ),
 
-                    // Теги (Погода и Стиль)
                     Row(
                       children: [
-                        // Плашка погоды
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
@@ -749,7 +741,6 @@ class _WardrobeScreenState extends State<WardrobeScreen> {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        // Плашка стиля
                         Expanded(
                           child: Container(
                             padding: const EdgeInsets.symmetric(

@@ -11,7 +11,6 @@ class OutfitCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Состояние: образ ещё не сгенерирован
     if (outfit == null) {
       return Container(
         padding: const EdgeInsets.all(32),
@@ -43,7 +42,6 @@ class OutfitCard extends StatelessWidget {
       );
     }
 
-    // 2. Состояние: образ готов
     final items = outfit!.values.whereType<ClothingItem>().toList();
 
     return Container(
@@ -62,7 +60,6 @@ class OutfitCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Блок с описанием от стилиста
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
@@ -142,7 +139,6 @@ class OutfitCard extends StatelessWidget {
             ),
           ),
 
-          // Сетка вещей — идентична гардеробу
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
             child: LayoutBuilder(
@@ -200,7 +196,6 @@ class OutfitCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Фото вещи
             Expanded(
               flex: 5,
               child: Hero(
@@ -220,7 +215,6 @@ class OutfitCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // Лёгкий градиент внизу
                     Positioned(
                       bottom: 0,
                       left: 0,
@@ -244,7 +238,6 @@ class OutfitCard extends StatelessWidget {
               ),
             ),
 
-            // Информационная часть
             Expanded(
               flex: 4,
               child: Padding(
@@ -253,7 +246,6 @@ class OutfitCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Название вещи
                     Text(
                       item.name,
                       maxLines: 1,
@@ -266,7 +258,6 @@ class OutfitCard extends StatelessWidget {
                       ),
                     ),
 
-                    // Цветовая точка + подкатегория
                     Row(
                       children: [
                         Container(
@@ -297,7 +288,6 @@ class OutfitCard extends StatelessWidget {
                       ],
                     ),
 
-                    // Плашки сезона и стиля
                     Row(
                       children: [
                         Container(

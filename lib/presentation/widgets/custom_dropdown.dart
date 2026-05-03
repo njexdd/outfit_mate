@@ -5,7 +5,7 @@ class CustomDropdown extends StatefulWidget {
   final List<String> items;
   final Function(String?) onChanged;
   final String label;
-  final bool searchable; // NEW: включает поиск в списке
+  final bool searchable;
 
   const CustomDropdown({
     super.key,
@@ -13,7 +13,7 @@ class CustomDropdown extends StatefulWidget {
     required this.items,
     required this.onChanged,
     this.label = '',
-    this.searchable = false, // по умолчанию — без поиска
+    this.searchable = false,
   });
 
   @override
@@ -26,7 +26,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
   OverlayEntry? _overlayEntry;
 
   static const double _itemHeight = 48.0;
-  static const double _searchBarHeight = 52.0; // высота строки поиска
+  static const double _searchBarHeight = 52.0;
   static const double _maxMenuHeight = 300.0;
 
   @override
@@ -50,7 +50,6 @@ class _CustomDropdownState extends State<CustomDropdown> {
     final buttonSize = buttonBox.size;
     final buttonPosition = buttonBox.localToGlobal(Offset.zero);
 
-    // Учитываем высоту строки поиска при расчёте высоты меню
     final double listHeight =
         (widget.items.length * _itemHeight).clamp(0.0, _maxMenuHeight);
     final double menuHeight = widget.searchable
@@ -167,9 +166,6 @@ class _CustomDropdownState extends State<CustomDropdown> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Внутренний виджет меню с анимацией и опциональным поиском
-// ─────────────────────────────────────────────────────────────────────────────
 class _DropdownMenu extends StatefulWidget {
   final List<String> items;
   final String selectedValue;
@@ -206,7 +202,6 @@ class _DropdownMenuState extends State<_DropdownMenu>
 
   bool _isClosing = false;
 
-  // Поиск
   final TextEditingController _searchController = TextEditingController();
   List<String> _filteredItems = [];
 
@@ -261,11 +256,10 @@ class _DropdownMenuState extends State<_DropdownMenu>
   @override
   Widget build(BuildContext context) {
     const double itemHeight = 48.0;
-    const double searchBarHeight = 52.0; // padding 10+6 + field 36
+    const double searchBarHeight = 52.0;
     const double emptyStateHeight = 48.0;
     const double maxListHeight = 300.0;
 
-    // Динамическая высота списка — пересчитывается при каждом rebuild
     final double listHeight = _filteredItems.isEmpty
         ? emptyStateHeight
         : (_filteredItems.length * itemHeight).clamp(0.0, maxListHeight);
@@ -293,7 +287,6 @@ class _DropdownMenuState extends State<_DropdownMenu>
             elevation: 8,
             borderRadius: BorderRadius.circular(16),
             child: AnimatedContainer(
-              // Плавно анимируем изменение высоты при фильтрации
               duration: const Duration(milliseconds: 150),
               curve: Curves.easeOut,
               height: totalHeight,
@@ -303,7 +296,6 @@ class _DropdownMenuState extends State<_DropdownMenu>
               ),
               child: Column(
                 children: [
-                  // ── Строка поиска (только при searchable: true) ──────────
                   if (widget.searchable)
                     Padding(
                       padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
@@ -337,7 +329,6 @@ class _DropdownMenuState extends State<_DropdownMenu>
                       ),
                     ),
 
-                  // ── Список городов ────────────────────────────────────────
                   Expanded(
                     child: _filteredItems.isEmpty
                         ? Center(

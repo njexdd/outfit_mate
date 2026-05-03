@@ -91,7 +91,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
         bottom: false,
         child: Column(
           children: [
-            // ── ЗАГОЛОВОК ──────────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
               child: Row(
@@ -134,7 +133,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
             ),
 
-            // ── СПИСОК ─────────────────────────────────────────────────
             Expanded(
               child: _isLoadingItems
                   ? const Center(child: CircularProgressIndicator())
@@ -149,7 +147,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
                         final outfits = snapshot.data!;
 
-                        // ПУСТОЕ СОСТОЯНИЕ
                         if (outfits.isEmpty) {
                           return Center(
                             child: Column(
@@ -249,7 +246,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── БЛОК ОПИСАНИЯ (идентичен OutfitCard) ──────────────────
           Container(
             padding: const EdgeInsets.fromLTRB(20, 18, 10, 16),
             decoration: BoxDecoration(
@@ -261,7 +257,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                // Декоративная кавычка
                 Positioned(
                   right: 0,
                   top: -10,
@@ -277,11 +272,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Дата + кнопки действий в одной строке
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Плашка с датой
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -313,7 +306,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ),
                         ),
 
-                        // Кнопки лайк + удалить
                         Row(
                           children: [
                             GestureDetector(
@@ -356,7 +348,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       ],
                     ),
 
-                    // Описание от стилиста
                     if (outfit.description != null &&
                         outfit.description!.isNotEmpty) ...[
                       const SizedBox(height: 14),
@@ -412,7 +403,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
 
-          // ── СЕТКА ВЕЩЕЙ (как в OutfitCard/wardrobe) ───────────────
           if (itemsInOutfit.isNotEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -441,7 +431,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  /// Тайл вещи — полностью идентичен wardrobe / OutfitCard
   Widget _buildItemTile(ClothingItem item) {
     final colorValue = item.color.length == 8
         ? Color(int.parse(item.color, radix: 16))
@@ -470,7 +459,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Фото
           Expanded(
             flex: 5,
             child: Stack(
@@ -488,7 +476,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                   ),
                 ),
-                // Лёгкий градиент внизу фото
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -511,7 +498,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
 
-          // Информация
           Expanded(
             flex: 4,
             child: Padding(
@@ -520,7 +506,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Название
                   Text(
                     item.name,
                     maxLines: 1,
@@ -533,7 +518,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                   ),
 
-                  // Цветовая точка + подкатегория
                   Row(
                     children: [
                       Container(
@@ -564,7 +548,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ],
                   ),
 
-                  // Плашки сезона и стиля
                   Row(
                     children: [
                       Container(

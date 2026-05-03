@@ -6,7 +6,7 @@ import '../models/weather_model.dart';
 
 class WeatherResult {
   final WeatherForecast forecast;
-  final bool isFromCache;   // true → данные из кэша, нет интернета
+  final bool isFromCache;
 
   const WeatherResult({required this.forecast, required this.isFromCache});
 }
@@ -24,7 +24,6 @@ class WeatherService {
     final cachedCity = prefs.getString(_cityKey);
     final lastUpdateStr = prefs.getString(_timeKey);
 
-    // Пробуем свежий кэш (< 6 ч, тот же город)
     if (cachedCity == city && lastUpdateStr != null) {
       final lastUpdate = DateTime.parse(lastUpdateStr);
       final difference = DateTime.now().difference(lastUpdate);
@@ -35,13 +34,12 @@ class WeatherService {
           print('Используем данные из кэша (обновлены ${difference.inMinutes} мин. назад)');
           return WeatherResult(
             forecast: WeatherForecast.fromJson(jsonDecode(jsonStr)),
-            isFromCache: false, // кэш свежий — интернет не нужен явно
+            isFromCache: false,
           );
         }
       }
     }
 
-    // Пробуем API
     return _fetchFromApi(city, prefs);
   }
 
@@ -74,13 +72,12 @@ class WeatherService {
         throw Exception('Ошибка загрузки погоды: ${response.statusCode}');
       }
     } on SocketException catch (_) {
-      // Нет интернета — отдаём устаревший кэш, если он есть
       final jsonStr = prefs.getString(_cacheKey);
       if (jsonStr != null) {
         print('Нет интернета. Используем устаревший кэш.');
         return WeatherResult(
           forecast: WeatherForecast.fromJson(jsonDecode(jsonStr)),
-          isFromCache: true,   // <-- сигнализируем UI
+          isFromCache: true,
         );
       }
       throw Exception('Нет интернета и кэш пуст');

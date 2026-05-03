@@ -56,7 +56,6 @@ class ItemDetailScreen extends StatelessWidget {
             ? Icons.ac_unit
             : (item.warmthLevel == 1 ? Icons.wb_sunny : Icons.cloud);
 
-        // Фирменные цвета приложения
         const gradientStart = Color(0xFF4A90E2);
         const gradientEnd = Color(0xFF002984);
 
@@ -64,7 +63,6 @@ class ItemDetailScreen extends StatelessWidget {
           backgroundColor: const Color(0xFFF5F7FA),
           body: Stack(
             children: [
-              // ── Белая подложка снизу (чтобы не было серого при прокрутке) ──
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -73,7 +71,6 @@ class ItemDetailScreen extends StatelessWidget {
                 child: const ColoredBox(color: Colors.white),
               ),
 
-              // ── Фото вещи (верхняя половина) ──────────────────────────────
               Positioned(
                 top: 0,
                 left: 0,
@@ -107,7 +104,6 @@ class ItemDetailScreen extends StatelessWidget {
                 ),
               ),
 
-              // ── Нижняя карточка с деталями ─────────────────────────────────
               Positioned.fill(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
@@ -136,7 +132,6 @@ class ItemDetailScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Drag indicator
                         Center(
                           child: Container(
                             width: 44,
@@ -149,11 +144,9 @@ class ItemDetailScreen extends StatelessWidget {
                           ),
                         ),
 
-                        // ── Категория + дата ───────────────────────────────
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // Категория — фирменный градиент
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 14,
@@ -185,7 +178,6 @@ class ItemDetailScreen extends StatelessWidget {
                               ),
                             ),
 
-                            // Дата добавления
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 12,
@@ -219,7 +211,6 @@ class ItemDetailScreen extends StatelessWidget {
 
                         const SizedBox(height: 20),
 
-                        // ── Название ───────────────────────────────────────
                         Text(
                           item.name,
                           style: const TextStyle(
@@ -244,7 +235,6 @@ class ItemDetailScreen extends StatelessWidget {
 
                         const SizedBox(height: 28),
 
-                        // ── Карточки Сезон + Стиль ─────────────────────────
                         Row(
                           children: [
                             Expanded(
@@ -263,15 +253,12 @@ class ItemDetailScreen extends StatelessWidget {
 
                         const SizedBox(height: 14),
 
-                        // ── Карточка Цвет ──────────────────────────────────
                         _buildColorCard(colorValue),
 
                         const SizedBox(height: 28),
 
-                        // ── Кнопки действий ───────────────────────────────
                         Row(
                           children: [
-                            // Редактировать — фирменный градиент
                             Expanded(
                               flex: 3,
                               child: Builder(
@@ -324,7 +311,6 @@ class ItemDetailScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            // Удалить — аутлайн
                             Expanded(
                               flex: 2,
                               child: Builder(
@@ -381,7 +367,6 @@ class ItemDetailScreen extends StatelessWidget {
                 ),
               ),
 
-              // ── Кнопка «Назад» ─────────────────────────────────────────────
               Positioned(
                 top: MediaQuery.of(context).padding.top + 12,
                 left: 16,
@@ -436,7 +421,6 @@ class ItemDetailScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Иконка с фирменным градиентом
           Container(
             width: 42,
             height: 42,
@@ -484,7 +468,6 @@ class ItemDetailScreen extends StatelessWidget {
   Widget _buildColorCard(Color colorValue) {
     const gradientStart = Color(0xFF4A90E2);
 
-    // Определяем, светлый ли цвет вещи
     final luminance = colorValue.computeLuminance();
     final isLight = luminance > 0.5;
 
@@ -497,7 +480,6 @@ class ItemDetailScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Иконка-пипетка с фирменным градиентом
           Container(
             width: 42,
             height: 42,
@@ -544,7 +526,6 @@ class ItemDetailScreen extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          // Цветной кружок с тенью в цвет вещи
           Container(
             width: 48,
             height: 48,

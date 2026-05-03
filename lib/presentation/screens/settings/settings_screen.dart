@@ -44,7 +44,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             const SizedBox(height: 20),
 
-            // ── ЗАГОЛОВОК ──────────────────────────────────────────────
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -185,7 +184,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Слайдер чувствительности к холоду ─────────────────
                   Row(
                     children: [
                       Container(
@@ -244,7 +242,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           style: TextStyle(color: Colors.grey, fontSize: 13)),
                     ],
                   ),
-                  // ──────────────────────────────────────────────────────
                   const Divider(height: 32),
                   CustomDropdown(
                     label: "Предпочитаемый стиль",

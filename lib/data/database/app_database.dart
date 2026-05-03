@@ -62,7 +62,7 @@ class AppDatabase extends _$AppDatabase {
 
   Stream<List<Outfit>> watchFavoriteOutfits() {
     return (select(outfits)
-      ..where((t) => t.isFavorite.equals(true)) // Фильтруем только лайкнутые
+      ..where((t) => t.isFavorite.equals(true))
       ..orderBy([(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)]))
       .watch();
   }

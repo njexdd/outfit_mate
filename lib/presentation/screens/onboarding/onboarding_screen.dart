@@ -23,7 +23,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   String _selectedStyle = 'Casual';
   String _selectedColors = 'Базовые';
 
-  // ── Цвета, соответствующие теме приложения ──────────────────────────────
   static const _primary = Color(0xFF4A90E2);
   static const _primaryDark = Color(0xFF002984);
   static const _bgColor = Color(0xFFF5F7FA);
@@ -72,7 +71,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // ── Нижняя навигация ────────────────────────────────────────────────────
   Widget _buildBottomNavigation() {
     final isLast = _currentPage == 3;
     return Padding(
@@ -80,7 +78,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Индикаторы шагов
           Row(
             children: List.generate(4, (index) {
               final isActive = _currentPage == index;
@@ -103,7 +100,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             }),
           ),
 
-          // Кнопка «Далее» / «Начать»
           Container(
             decoration: BoxDecoration(
               gradient: const LinearGradient(
@@ -169,14 +165,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // ── Шаг 1: Приветствие ──────────────────────────────────────────────────
   Widget _buildStep1Intro() {
     return Padding(
       padding: const EdgeInsets.all(28.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Иконка в градиентном круге
           Container(
             padding: const EdgeInsets.all(28),
             decoration: BoxDecoration(
@@ -212,7 +206,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Карточка с описанием
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -238,7 +231,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 32),
 
-          // Три фичи
           ...[
             (Icons.wb_sunny_rounded, "Учитывает погоду"),
             (Icons.auto_awesome_rounded, "Подбирает из вашего гардероба"),
@@ -273,7 +265,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // ── Шаг 2: Город ────────────────────────────────────────────────────────
   Widget _buildStep2Location() {
     final filteredCities = AppConstants.belarusCities
         .where((city) => city.toLowerCase().contains(_searchQuery.toLowerCase()))
@@ -291,7 +282,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 20),
 
-          // Поиск
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -401,7 +391,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // ── Шаг 3: О себе ───────────────────────────────────────────────────────
   Widget _buildStep3Demographics() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
@@ -501,7 +490,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // ── Шаг 4: Предпочтения ─────────────────────────────────────────────────
   Widget _buildStep4Preferences() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
@@ -517,7 +505,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             const SizedBox(height: 28),
 
-            // Карточка чувствительности к холоду
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -608,8 +595,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
     );
   }
-
-  // ── Вспомогательные виджеты ──────────────────────────────────────────────
 
   Widget _buildStepHeader({
     required IconData icon,

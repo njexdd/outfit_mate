@@ -218,10 +218,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isEditing = widget.itemToEdit != null; // [cite: 528]
+    final isEditing = widget.itemToEdit != null;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA), // Фирменный фон
+      backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -256,28 +256,26 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
-  // Секция с фотографией и кнопкой ИИ-сканера
-  // Секция с фотографией и кнопкой ИИ-сканера
   Widget _buildImageSection() {
     return Column(
       children: [
         GestureDetector(
-          onTap: () => _pickImage(ImageSource.gallery), //
+          onTap: () => _pickImage(ImageSource.gallery),
           child: Container(
             height: 240,
             width: double.infinity,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(24), // В стиле OutfitCard
+              borderRadius: BorderRadius.circular(24),
               border: _imageFile == null && _existingImagePath == null
                   ? Border.all(
                       color: Colors.grey.shade300,
                       style: BorderStyle.solid,
-                    ) //
+                    )
                   : null,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04), //
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -310,14 +308,13 @@ class _AddItemScreenState extends State<AddItemScreen> {
         ),
         const SizedBox(height: 16),
 
-        // ИСПРАВЛЕНО: Кнопка AI-сканирования теперь с видимым фоном-градиентом
         Container(
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [
                 Color(0xFF4A90E2),
                 Color(0xFF002984),
-              ], // Наш фирменный градиент
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -326,7 +323,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
               BoxShadow(
                 color: const Color(
                   0xFF4A90E2,
-                ).withValues(alpha: 0.3), // Легкое свечение
+                ).withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -354,9 +351,9 @@ class _AddItemScreenState extends State<AddItemScreen> {
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
               backgroundColor: Colors
-                  .transparent, // Фон прозрачный, чтобы было видно градиент контейнера
+                  .transparent,
               shadowColor: Colors
-                  .transparent, // Убираем стандартную тень кнопки, т.к. есть тень у контейнера
+                  .transparent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -367,23 +364,22 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
-  // Карточка с формой ввода
   Widget _buildFormCard() {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24), //
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03), //
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Form(
-        key: _formKey, // [cite: 519]
+        key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -393,7 +389,7 @@ class _AddItemScreenState extends State<AddItemScreen> {
             ),
             const SizedBox(height: 8),
             TextFormField(
-              controller: _nameController, // [cite: 519]
+              controller: _nameController,
               decoration: InputDecoration(
                 hintText: 'Например: Любимое худи',
                 filled: true,
@@ -417,16 +413,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
             const SizedBox(height: 20),
 
             CustomDropdown(
-              // [cite: 550]
               label: 'Категория',
               value: _selectedCategory,
-              items: _categories.cast<String>(), // [cite: 522]
+              items: _categories.cast<String>(),
               onChanged: (val) {
                 if (val != null)
                   setState(() {
                     _selectedCategory = val;
                     _selectedSubCategory =
-                        _subCategoriesMap[val]?.first; // [cite: 522]
+                        _subCategoriesMap[val]?.first;
                   });
               },
             ),
@@ -434,7 +429,6 @@ class _AddItemScreenState extends State<AddItemScreen> {
 
             if (_selectedSubCategory != null) ...[
               CustomDropdown(
-                // [cite: 550]
                 label: 'Подкатегория',
                 value: _selectedSubCategory!,
                 items: _subCategoriesMap[_selectedCategory] ?? [],
@@ -446,17 +440,15 @@ class _AddItemScreenState extends State<AddItemScreen> {
             ],
 
             CustomDropdown(
-              // [cite: 550]
               label: 'Стиль',
               value: _selectedStyle,
-              items: _styles.cast<String>(), // [cite: 522]
+              items: _styles.cast<String>(),
               onChanged: (val) {
                 if (val != null) setState(() => _selectedStyle = val);
               },
             ),
             const SizedBox(height: 20),
 
-            // Выбор цвета и теплоты в одном ряду для компактности
             Row(
               children: [
                 Expanded(
@@ -472,11 +464,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
                       ),
                       const SizedBox(height: 8),
                       GestureDetector(
-                        onTap: _showColorPicker, // [cite: 525]
+                        onTap: _showColorPicker,
                         child: Container(
                           height: 50,
                           decoration: BoxDecoration(
-                            color: _currentColor, // [cite: 521]
+                            color: _currentColor,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: Colors.grey.shade300,
@@ -491,13 +483,12 @@ class _AddItemScreenState extends State<AddItemScreen> {
                 const SizedBox(width: 16),
                 Expanded(
                   child: CustomDropdown(
-                    // [cite: 550]
                     label: 'Сезон',
                     value: _warmthLevel == 1
                         ? 'Лето'
                         : (_warmthLevel == 2
                               ? 'Деми'
-                              : 'Зима'), // [cite: 541, 542]
+                              : 'Зима'),
                     items: const ['Лето', 'Деми', 'Зима'],
                     onChanged: (val) {
                       setState(() {
@@ -516,12 +507,10 @@ class _AddItemScreenState extends State<AddItemScreen> {
     );
   }
 
-  // Кнопка сохранения в стиле FloatingActionButton из WardrobeScreen
   Widget _buildSaveButton(bool isEditing) {
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          // Фирменный градиент
           colors: [Color(0xFF4A90E2), Color(0xFF002984)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -529,14 +518,14 @@ class _AddItemScreenState extends State<AddItemScreen> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A90E2).withValues(alpha: 0.4), //
+            color: const Color(0xFF4A90E2).withValues(alpha: 0.4),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
         ],
       ),
       child: ElevatedButton(
-        onPressed: _saveItem, // [cite: 527]
+        onPressed: _saveItem,
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 18),
           backgroundColor: Colors.transparent,
